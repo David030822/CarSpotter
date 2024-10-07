@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       theme: Provider.of<ThemeProvider>(context).themeData,
       debugShowCheckedModeBanner: false,
       home: ResponsiveLayout(
-        mobileScaffold: const MobileScaffold(),/* const LoginPage(),*/
+        mobileScaffold: /*const MobileScaffold(),*/ const LoginPage(),
         tabletScaffold: const TabletScaffold(),
         desktopScaffold: const DesktopScaffold(),
       ),

@@ -3,6 +3,7 @@ import 'package:mobile_ui/components/my_bottom_navbar.dart';
 import 'package:mobile_ui/components/my_drawer.dart';
 import 'package:mobile_ui/pages/favourites_page.dart';
 import 'package:mobile_ui/pages/main_page.dart';
+import 'package:mobile_ui/pages/search_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,6 +28,9 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     // main page
     const MainPage(),
+
+    // search page
+    const SearchPage(),
 
     // favourites page
     const FavouritesPage(),

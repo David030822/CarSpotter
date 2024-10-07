@@ -26,6 +26,10 @@ class MyBottomNavBar extends StatelessWidget {
             text: 'Home'
           ),
           GButton(
+            icon: Icons.search,
+            text: 'Search'
+          ),
+          GButton(
             icon: Icons.favorite,
             text: 'Favourites',
           ),
