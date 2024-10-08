@@ -5,9 +5,14 @@ import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/models/dealer.dart';
 import 'package:mobile_ui/pages/dealer_cars_page.dart';
 
-class FavouritesPage extends StatelessWidget {
+class FavouritesPage extends StatefulWidget {
   const FavouritesPage({super.key});
 
+  @override
+  State<FavouritesPage> createState() => _FavouritesPageState();
+}
+
+class _FavouritesPageState extends State<FavouritesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,11 +43,23 @@ class FavouritesPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const DealerCarsPage(),
+                            builder: (context) => DealerCarsPage(cars: dealer.cars),
                           ),
                         );
                     },
-                    onButtonTap: () {},
+                    onButtonTap: () {
+                      setState(() {
+                        dealer.isFavorited = !dealer.isFavorited;
+                      });
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(dealer.isFavorited
+                              ? '${dealer.name} added to favorites'
+                              : '${dealer.name} removed from favorites'),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

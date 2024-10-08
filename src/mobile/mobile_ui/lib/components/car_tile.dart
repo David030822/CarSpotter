@@ -73,7 +73,7 @@ class CarTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        car.kilometers.toString(),
+                        "${car.kilometers.toString()} Km",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.inversePrimary,
                         )

@@ -35,12 +35,12 @@ class MainPage extends StatelessWidget {
                     car: car,
                     onTap: () {
                       Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CarDetailsPage(),
-                          ),
-                        );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CarDetailsPage(),
+                        ),
+                      );
                     },
                     onButtonTap: () {},
                   );

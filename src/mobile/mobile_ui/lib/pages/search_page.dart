@@ -81,11 +81,23 @@ class _SearchPageState extends State<SearchPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const DealerCarsPage(),
+                            builder: (context) => DealerCarsPage(cars: dealer.cars),
                           ),
                         );
                     },
-                    onButtonTap: () {},
+                    onButtonTap: () {
+                      setState(() {
+                        dealer.isFavorited = !dealer.isFavorited;
+                      });
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(dealer.isFavorited
+                              ? '${dealer.name} added to favorites'
+                              : '${dealer.name} removed from favorites'),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

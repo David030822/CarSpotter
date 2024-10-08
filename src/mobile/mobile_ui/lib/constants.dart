@@ -17,31 +17,25 @@ List<Dealer> dealers = [
     name: 'David BYS\n     Cars',
     location: 'Ivanesti',
     activeSince: 2024,
-    imagePath: 'assets/images/DavidBysCars.png'
+    imagePath: 'assets/images/DavidBysCars.png',
+    cars: davidCars,
+    isFavorited: true
   ),
   Dealer(
     name: 'Cristal Auto',
     location: 'Targu Mures',
     activeSince: 2016,
-    imagePath: 'assets/images/CristalAuto.png'
+    imagePath: 'assets/images/CristalAuto.png',
+    cars: cristalCars,
+    isFavorited: false
   ),
   Dealer(
     name: 'Royal\nAutomobile\nMures',
     location: 'Targu Mures',
     activeSince: 2020,
-    imagePath: 'assets/images/Royal.png'
-  ),
-  Dealer(
-    name: 'David BYS Cars',
-    location: 'Ivanesti',
-    activeSince: 2024,
-    imagePath: 'assets/images/DavidBysCars.png'
-  ),
-  Dealer(
-    name: 'David BYS Cars',
-    location: 'Ivanesti',
-    activeSince: 2024,
-    imagePath: 'assets/images/DavidBysCars.png'
+    imagePath: 'assets/images/Royal.png',
+    cars: royalCars,
+    isFavorited: false
   )
 ];
 
@@ -103,3 +97,34 @@ List<Car> myCars = [
 List<Car> getMyCars() {
   return myCars;
 }
+
+List<Car> davidCars = [
+  Car(
+    name: 'Audi A6',
+    year: 2018,
+    kilometers: 137521,
+    fuelType: 'Diesel',
+    imagePath: 'assets/images/AudiA6.jpg'
+  ),
+  Car(
+    name: 'Audi A3',
+    year: 2012,
+    kilometers: 217151,
+    fuelType: 'Diesel',
+    imagePath: 'assets/images/AudiA3.jpg'
+  ),
+  Car(
+    name: 'Audi A4',
+    year: 2019,
+    kilometers: 141257,
+    fuelType: 'Diesel',
+    imagePath: 'assets/images/AudiA4.jpg'
+  ),
+];
+
+List<Car> getDavidCars() {
+  return davidCars;
+}
+
+List<Car> royalCars = [];
+List<Car> cristalCars = [];
