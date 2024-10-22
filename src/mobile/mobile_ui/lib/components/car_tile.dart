@@ -67,11 +67,18 @@ class CarTile extends StatelessWidget {
               padding: const EdgeInsets.only(left: 25.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        car.fuelType,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                        ),
+                      ),
+
                       Text(
                         "${car.kilometers.toString()} Km",
                         style: TextStyle(
@@ -79,12 +86,24 @@ class CarTile extends StatelessWidget {
                         )
                       ),
               
-                      const SizedBox(height: 5),
-              
                       Text(
-                        "Manufacture year ${car.year}",
+                        "Manufactured in ${car.year}",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.inversePrimary,
+                        ),
+                      ),
+
+                      const SizedBox(height: 5),
+
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 5.0),
+                        child: Text(
+                          "${car.price.toString()} €",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold
+                          ),
                         ),
                       ),
                     ],

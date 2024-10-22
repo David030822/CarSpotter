@@ -24,7 +24,7 @@ class MyDrawer extends StatelessWidget {
               children: [
                 // header
                 DrawerHeader(
-                  child: Icon(Icons.fitness_center),
+                  child: Icon(Icons.directions_car),
                 ),
         
                 // home tile

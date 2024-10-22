@@ -76,21 +76,36 @@ List<Car> myCars = [
     year: 2018,
     kilometers: 137521,
     fuelType: 'Diesel',
-    imagePath: 'assets/images/AudiA6.jpg'
+    price: 30500,
+    imagePath: 'assets/images/AudiA6.jpg',
+    gearbox: 'Automatic',
+    chassis: 'Combi',
+    engineSize: 1968,
+    horsepower: 204
   ),
   Car(
     name: 'Audi A3',
     year: 2012,
     kilometers: 217151,
     fuelType: 'Diesel',
-    imagePath: 'assets/images/AudiA3.jpg'
+    price: 7500,
+    imagePath: 'assets/images/AudiA3.jpg',
+    gearbox: 'Manual',
+    chassis: 'Compact',
+    engineSize: 1968,
+    horsepower: 140
   ),
   Car(
     name: 'Audi A4',
     year: 2019,
     kilometers: 141257,
     fuelType: 'Diesel',
-    imagePath: 'assets/images/AudiA4.jpg'
+    price: 18500,
+    imagePath: 'assets/images/AudiA4.jpg',
+    gearbox: 'Automatic',
+    chassis: 'Combi',
+    engineSize: 1968,
+    horsepower: 150
   ),
 ];
 
@@ -98,29 +113,7 @@ List<Car> getMyCars() {
   return myCars;
 }
 
-List<Car> davidCars = [
-  Car(
-    name: 'Audi A6',
-    year: 2018,
-    kilometers: 137521,
-    fuelType: 'Diesel',
-    imagePath: 'assets/images/AudiA6.jpg'
-  ),
-  Car(
-    name: 'Audi A3',
-    year: 2012,
-    kilometers: 217151,
-    fuelType: 'Diesel',
-    imagePath: 'assets/images/AudiA3.jpg'
-  ),
-  Car(
-    name: 'Audi A4',
-    year: 2019,
-    kilometers: 141257,
-    fuelType: 'Diesel',
-    imagePath: 'assets/images/AudiA4.jpg'
-  ),
-];
+List<Car> davidCars = myCars;
 
 List<Car> getDavidCars() {
   return davidCars;

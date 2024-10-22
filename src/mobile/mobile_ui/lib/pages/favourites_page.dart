@@ -40,12 +40,16 @@ class _FavouritesPageState extends State<FavouritesPage> {
                     dealer: dealer,
                     onTap: () {
                       Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DealerCarsPage(cars: dealer.cars),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DealerCarsPage(
+                            cars: dealer.cars,
+                            name: dealer.name,
+                            parentRoute: '/home_page',
                           ),
-                        );
+                        ),
+                      );
                     },
                     onButtonTap: () {
                       setState(() {
