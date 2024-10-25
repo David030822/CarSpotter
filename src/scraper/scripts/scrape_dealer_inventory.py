@@ -73,8 +73,10 @@ def fetch_car_details(car_link):
                     if year_match:
                         manufacturing_year = year_match.group()
 
-            post_date = car_soup.find('p', class_='ew0z61v1 ooa-1oajvmg er34gjf0').text.strip()
+            post_date = car_soup.find('p', class_='ei6c8gd1 ooa-1oajvmg er34gjf0').text.strip()
             post_id = car_soup.find('p', class_='e1n40z81 ooa-a4miog er34gjf0').text.strip()
+
+            dealer_name = car_soup.find('p', class_='ern8z622 ooa-hlpbot er34gjf0').text.strip()
 
             romanian_months = {
                 'ianuarie': 'January', 'februarie': 'February', 'martie': 'March', 'aprilie': 'April',
@@ -90,7 +92,9 @@ def fetch_car_details(car_link):
             post_date = date_obj.strftime("%d.%m.%Y")
 
             post_id = re.findall(r'\d+', post_id)[0]
-
+            images = car_soup.find('div', class_='ooa-12np8kw e142atj30').findChild('img')
+            image_link = images['srcset'].split(" ")[0]
+            
             return {
                 'dealer': dealer_name,
                 'car_model': car_model,
@@ -103,7 +107,8 @@ def fetch_car_details(car_link):
                 'power': power,
                 'price': price,
                 'post_date': post_date,
-                'post_id': post_id
+                'post_id': post_id,
+                'image' : image_link
             }
 
     except Exception as e:
@@ -112,8 +117,10 @@ def fetch_car_details(car_link):
 
 
 def scrape_dealer_inventory(dealer_name, max_pages=None):
+    dealer_name = dealer_name.lower()
+    dealer_name = dealer_name.replace(" ", "")
     base_url = f'https://{dealer_name}.autovit.ro/inventory'
-
+    
     car_data = []
     page = 1
 
@@ -153,7 +160,8 @@ def scrape_dealer_inventory(dealer_name, max_pages=None):
 
 
 # Példa használat
-dealer_name = 'royalautomobilemures'
+#dealer_name = 'Royal AutomobileMures'
+dealer_name = 'Royal AutomobileMures'
 
 start_time = time.time()
 car_list = scrape_dealer_inventory(dealer_name)
@@ -166,4 +174,4 @@ for i, car in enumerate(car_list, start=1):
           f"Manufacturing Year: {car['manufacturing_year']}, Mileage: {car['mileage']}, "
           f"Fuel Type: {car['fuel_type']}, Gearbox: {car['gearbox']}, "
           f"Body Type: {car['body_type']}, Engine Capacity: {car['engine_capacity']}, "
-          f"Power: {car['power']}, Post Date: {car['post_date']}, Post ID: {car['post_id']}")
+          f"Power: {car['power']}, Post Date: {car['post_date']}, Post ID: {car['post_id']}, Image Link: {car['image']}")
