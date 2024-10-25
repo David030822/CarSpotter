@@ -41,7 +41,7 @@ class CarDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
 
             Text(
-              car.name,
+              "Model: ${car.name}",
               style: GoogleFonts.dmSerifText(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -51,7 +51,7 @@ class CarDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
 
             Text(
-              car.fuelType,
+              "Fuel type: ${car.fuelType}",
               style: GoogleFonts.dmSerifText(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -61,7 +61,7 @@ class CarDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
 
             Text(
-              car.kilometers.toString(),
+              "Kilometers: ${car.kilometers.toString()}",
               style: GoogleFonts.dmSerifText(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -71,7 +71,7 @@ class CarDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
 
             Text(
-              car.year.toString(),
+              "Manufacture year: ${car.year.toString()}",
               style: GoogleFonts.dmSerifText(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -81,7 +81,7 @@ class CarDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
 
             Text(
-              car.price.toString(),
+              "Price: ${car.price.toString()}",
               style: GoogleFonts.dmSerifText(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -91,7 +91,7 @@ class CarDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
 
             Text(
-              car.chassis,
+              "Chassis type: ${car.chassis}",
               style: GoogleFonts.dmSerifText(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -101,7 +101,7 @@ class CarDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
 
             Text(
-              car.gearbox,
+              "Gearbox: ${car.gearbox}",
               style: GoogleFonts.dmSerifText(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -111,7 +111,7 @@ class CarDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
 
             Text(
-              car.engineSize.toString(),
+              "Engine size: ${car.engineSize.toString()} cm³",
               style: GoogleFonts.dmSerifText(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -121,14 +121,12 @@ class CarDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
 
             Text(
-              car.horsepower.toString(),
+              "Horsepower: ${car.horsepower.toString()}",
               style: GoogleFonts.dmSerifText(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.inversePrimary,
               )
             ),
-
-            const SizedBox(height: 15),
           ],
         ),
       ),
