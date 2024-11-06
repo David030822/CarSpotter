@@ -11,7 +11,7 @@ HEADERS = {
 }
 
 def fetch_car_details(car_link):
-    try:
+    # try:
         car_response = requests.get(car_link, headers=HEADERS)
         if car_response.status_code == 200:
             car_soup = BeautifulSoup(car_response.text, 'html.parser')
@@ -73,7 +73,7 @@ def fetch_car_details(car_link):
                     if year_match:
                         manufacturing_year = year_match.group()
 
-            post_date = car_soup.find('p', class_='ei6c8gd1 ooa-1oajvmg er34gjf0').text.strip()
+            post_date = car_soup.find('p', class_='e1jwj3576 ooa-193mje5').text.strip()
             post_id = car_soup.find('p', class_='e1n40z81 ooa-a4miog er34gjf0').text.strip()
 
             dealer_name = car_soup.find('p', class_='ern8z622 ooa-hlpbot er34gjf0').text.strip()
@@ -111,9 +111,9 @@ def fetch_car_details(car_link):
                 'image' : image_link
             }
 
-    except Exception as e:
-        print(f"Error: {e} - Link: {car_link}")
-        return None
+    # except Exception as e:
+    #     print(f"Error: {e} - Link: {car_link}")
+    #     return None
 
 
 def scrape_dealer_inventory(dealer_name, max_pages=None):
@@ -157,7 +157,6 @@ def scrape_dealer_inventory(dealer_name, max_pages=None):
             break
 
     return car_data
-
 
 # Példa használat
 #dealer_name = 'Royal AutomobileMures'
