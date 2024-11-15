@@ -1,5 +1,6 @@
 import concurrent
 import re
+import time
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
@@ -96,20 +97,22 @@ def fetch_car_details(car_link):
             
             return {
                 'dealer': dealer_name,
-                'model': car_model,
-                'year': manufacturing_year,
-                'km': mileage,
-                'combustible': fuel_type,
+                'car_model': car_model,
+                'manufacturing_year': manufacturing_year,
+                'mileage': mileage,
+                'fuel_type': fuel_type,
                 'gearbox': gearbox,
                 'body_type': body_type,
-                'cylinder_capacity': engine_capacity,
+                'engine_capacity': engine_capacity,
                 'power': power,
                 'price': price,
-                'dateof_post': post_date,
-                'id_post': post_id,
-                'img_url' : image_link
+                'post_date': post_date,
+                'post_id': post_id,
+                'image' : image_link
             }
+
     except Exception as e:
+        print(f"Error: {e} - Link: {car_link}")
         return None
 
 
@@ -154,3 +157,19 @@ def scrape_dealer_inventory(dealer_name, max_pages=None):
             break
 
     return car_data
+
+# Példa használat
+dealer_name = 'Royal AutomobileMures'
+
+start_time = time.time()
+car_list = scrape_dealer_inventory(dealer_name)
+end_time = time.time()
+
+print(f"Scraping completed in {end_time - start_time:.2f} seconds.")
+
+for i, car in enumerate(car_list, start=1):
+    print(f"{i}. Car: {car['car_model']}, Price: {car['price']}, Dealer: {car['dealer']}, "
+          f"Manufacturing Year: {car['manufacturing_year']}, Mileage: {car['mileage']}, "
+          f"Fuel Type: {car['fuel_type']}, Gearbox: {car['gearbox']}, "
+          f"Body Type: {car['body_type']}, Engine Capacity: {car['engine_capacity']}, "
+          f"Power: {car['power']}, Post Date: {car['post_date']}, Post ID: {car['post_id']}, Image Link: {car['image']}")
