@@ -76,7 +76,7 @@ List<Car> myCars = [
     year: 2018,
     kilometers: 137521,
     fuelType: 'Diesel',
-    price: 30500,
+    price: 29500,
     imagePath: 'assets/images/AudiA6.jpg',
     gearbox: 'Automatic',
     chassis: 'Combi',

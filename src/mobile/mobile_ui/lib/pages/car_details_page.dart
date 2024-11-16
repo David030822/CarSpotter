@@ -30,6 +30,17 @@ class CarDetailsPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                car.imagePath,
+                height: 200,
+                width: 300,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
             Text(
               'Car Details',
               style: GoogleFonts.dmSerifText(

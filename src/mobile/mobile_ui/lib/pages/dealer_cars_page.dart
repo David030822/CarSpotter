@@ -4,7 +4,7 @@ import 'package:mobile_ui/components/car_tile.dart';
 import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/pages/car_details_page.dart';
 
-class DealerCarsPage extends StatelessWidget {
+class DealerCarsPage extends StatefulWidget {
   final List<Car> cars;
   final String name;
   final String parentRoute;
@@ -15,6 +15,14 @@ class DealerCarsPage extends StatelessWidget {
     required this.name,
     required this.parentRoute
   }) : super(key: key);
+
+  @override
+  State<DealerCarsPage> createState() => _DealerCarsPageState();
+}
+
+class _DealerCarsPageState extends State<DealerCarsPage> {
+    void editCarBox(Car car) {}
+  void deleteCarBox(Car car) {}
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +36,7 @@ class DealerCarsPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
             Navigator.pushNamed(
-              context, parentRoute
+              context, widget.parentRoute
             );
           },
         ),
@@ -44,7 +52,7 @@ class DealerCarsPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 25, bottom: 10),
                   child: Text(
-                      'Cars from $name',
+                      'Cars from ${widget.name}',
                       style: GoogleFonts.dmSerifText(
                         fontSize: 24,
                         color: Theme.of(context).colorScheme.inversePrimary,
@@ -56,22 +64,24 @@ class DealerCarsPage extends StatelessWidget {
 
             Expanded(
               child: ListView.builder(
-                itemCount: cars.length,
+                itemCount: widget.cars.length,
                 itemBuilder: (context, index) {
-                  return cars.isEmpty ? Text(
+                  return widget.cars.isEmpty ? Text(
                     'No cars from\nthis dealer yet...',
                     style: GoogleFonts.dmSerifText (
                       fontSize: 24,
                       color: Theme.of(context).colorScheme.inversePrimary,
                     ),
                   ) : CarTile(
-                      car: cars[index],
+                      car: widget.cars[index],
+                      editCar: (context) => editCarBox(widget.cars[index]),
+                      deleteCar: (context) => deleteCarBox(widget.cars[index]),
                       onTap: () {
                         Navigator.pop(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CarDetailsPage(car: cars[index]),
+                            builder: (context) => CarDetailsPage(car: widget.cars[index]),
                           ),
                         );
                       },
