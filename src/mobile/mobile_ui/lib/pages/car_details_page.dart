@@ -32,7 +32,7 @@ class CarDetailsPage extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
+              child: Image.network(
                 car.imagePath,
                 height: 200,
                 width: 300,

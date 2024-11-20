@@ -3,11 +3,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mobile_ui/models/car.dart';
 
 class CarTile extends StatelessWidget {
-  Car car;
+  final Car car;
   final void Function(BuildContext)? editCar;
   final void Function(BuildContext)? deleteCar;
-  void Function() onTap;
-  void Function()? onButtonTap;
+  final void Function() onTap;
+  final void Function()? onButtonTap;
 
   CarTile({
     super.key,
@@ -15,7 +15,7 @@ class CarTile extends StatelessWidget {
     required this.editCar,
     required this.deleteCar,
     required this.onTap,
-    required this.onButtonTap
+    required this.onButtonTap,
   });
 
   @override
@@ -26,15 +26,15 @@ class CarTile extends StatelessWidget {
         endActionPane: ActionPane(
           motion: const StretchMotion(),
           children: [
-            // edit option
+            // Edit option
             SlidableAction(
               onPressed: editCar,
               backgroundColor: Theme.of(context).colorScheme.inversePrimary,
               icon: Icons.edit,
               borderRadius: BorderRadius.circular(8),
             ),
-      
-            // delete option
+
+            // Delete option
             SlidableAction(
               onPressed: deleteCar,
               backgroundColor: Colors.red,
@@ -52,29 +52,27 @@ class CarTile extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // car image
+              // Car image and name
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Car image
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: car.imagePath.isNotEmpty
-                          ? Image.asset(
-                              car.imagePath,
-                              height: 100,
-                              width: 150,
-                              fit: BoxFit.cover,
-                            )
-                          : const Icon(
-                              Icons.directions_car,
-                              size: 100,
-                            ),
+                      child: Image.network(
+                        car.imagePath, // URL for the image
+                        height: 100,
+                        width: 150,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.broken_image, size: 100),
+                      ),
                     ),
                   ),
-        
-                  // name
+
+                  // Car name
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -85,9 +83,9 @@ class CarTile extends StatelessWidget {
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.inversePrimary,
                               fontWeight: FontWeight.bold,
-                              fontSize: 20
+                              fontSize: 20,
                             ),
-                            overflow: TextOverflow.ellipsis, // Handle overflow
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -95,8 +93,8 @@ class CarTile extends StatelessWidget {
                   ),
                 ],
               ),
-        
-              // kilometers + manufacture year
+
+              // Car details
               Padding(
                 padding: const EdgeInsets.only(left: 25.0),
                 child: Row(
@@ -112,23 +110,19 @@ class CarTile extends StatelessWidget {
                             color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                         ),
-        
                         Text(
                           "${car.kilometers.toString()} Km",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.inversePrimary,
-                          )
+                          ),
                         ),
-                
                         Text(
                           "Manufactured in ${car.year}",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                         ),
-        
                         const SizedBox(height: 5),
-        
                         Padding(
                           padding: const EdgeInsets.only(bottom: 5.0),
                           child: Text(
@@ -136,14 +130,14 @@ class CarTile extends StatelessWidget {
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.inversePrimary,
                               fontSize: 16,
-                              fontWeight: FontWeight.bold
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ],
                     ),
-        
-                    // button to edit car details
+
+                    // Button to edit car details
                     GestureDetector(
                       onTap: onButtonTap,
                       child: Container(
@@ -165,7 +159,7 @@ class CarTile extends StatelessWidget {
                 ),
               ),
             ],
-          )
+          ),
         ),
       ),
     );
