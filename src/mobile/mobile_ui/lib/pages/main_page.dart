@@ -53,7 +53,7 @@ class _MainPageState extends State<MainPage> {
                       editCar: (context) => editCarBox(car),
                       deleteCar: (context) => deleteCarBox(car),
                       onTap: () {
-                        Navigator.pop(context);
+                        // Navigator.pop(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(

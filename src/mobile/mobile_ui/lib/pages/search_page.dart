@@ -94,13 +94,13 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ],
                     ),
-                    if (_isLoading) CircularProgressIndicator(),
+                    if (_isLoading) const CircularProgressIndicator(),
                     if (!_isLoading &&
                         _dealerCars.isEmpty &&
                         _searchController.text.isNotEmpty)
                       Text(
                         'No cars found for "${_searchController.text}".',
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                   ],
                 ),

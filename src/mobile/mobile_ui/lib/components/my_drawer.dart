@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mobile_ui/components/drawer_tile.dart';
+import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/pages/about_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/login_page.dart';
@@ -51,7 +52,7 @@ class MyDrawer extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProfilePage(),
+                        builder: (context) => ProfilePage(user: users[0]),
                       ),
                     );
                   } 

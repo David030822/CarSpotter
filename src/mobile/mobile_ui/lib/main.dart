@@ -1,13 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:mobile_ui/pages/dealer_cars_page.dart';
 import 'package:mobile_ui/pages/favourites_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/login_page.dart';
 import 'package:mobile_ui/pages/main_page.dart';
 import 'package:mobile_ui/pages/search_page.dart';
 import 'package:mobile_ui/responsive/desktop_scaffold.dart';
+// ignore: unused_import
 import 'package:mobile_ui/responsive/mobile_scaffold.dart';
 import 'package:mobile_ui/responsive/responsive_layout.dart';
 import 'package:mobile_ui/responsive/tablet_scaffold.dart';

@@ -217,7 +217,7 @@ packages:
     source: hosted
     version: "0.15.4"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: b9c29a161230ee03d3ccf545097fccd9b87a5264228c5d348202e0f0c28f9010
@@ -504,6 +504,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.2"
+  rename_app:
+    dependency: "direct main"
+    description:
+      name: rename_app
+      sha256: "0267b7507ca70ede47b1e5a0b391e547d0e0854956a00fad2585fb6c5968dc24"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.1"
   sky_engine:
     dependency: transitive
     description: flutter

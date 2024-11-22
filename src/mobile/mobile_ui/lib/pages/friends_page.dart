@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_ui/components/friend_tile.dart';
-import 'package:mobile_ui/components/my_drawer.dart';
 import 'package:mobile_ui/constants.dart';
-import 'package:mobile_ui/models/friend.dart';
+import 'package:mobile_ui/models/user.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({super.key});
@@ -21,7 +20,7 @@ class _FriendsPageState extends State<FriendsPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      drawer: const MyDrawer(),
+      // drawer: const MyDrawer(),
       body: Center(
         child: Column(
           children: [
@@ -38,7 +37,7 @@ class _FriendsPageState extends State<FriendsPage> {
               scrollDirection: Axis.vertical,
               itemBuilder: (context, index) {
                 // get friend from friend list/db
-                Friend friend = getFriendList()[index];
+                User friend = getUserList()[index + 1];
 
                 return FriendTile(friend: friend);
               },

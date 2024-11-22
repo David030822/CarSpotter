@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_ui/models/car.dart';
-import 'package:mobile_ui/pages/home_page.dart';
 
 class CarDetailsPage extends StatelessWidget {
   final Car car;
@@ -14,17 +13,6 @@ class CarDetailsPage extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        leading: BackButton(
-          onPressed: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HomePage()
-              ),
-            );
-          }
-        ),
       ),
       body: Center(
         child: Column(
