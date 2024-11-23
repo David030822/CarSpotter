@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_ui/models/dealer.dart';
+import 'package:mobile_ui/services/auth_service.dart';
+import 'package:mobile_ui/services/api_service.dart';
 
 class DealerTile extends StatefulWidget {
   final Dealer dealer;
@@ -19,7 +21,23 @@ class DealerTile extends StatefulWidget {
 }
 
 class _DealerTileState extends State<DealerTile> {
-  bool isFavorited = false; // Track the favorite status
+  bool isFavorited = false;
+  int? userId; 
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserId();
+    isFavorited = widget.dealer.isFavorited;
+  }
+
+  Future<void> _initializeUserId() async {
+    final token = await AuthService.getToken();
+    final userIdFromToken = await AuthService.getUserIdFromToken(token);
+    setState(() {
+      userId = userIdFromToken;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +45,6 @@ class _DealerTileState extends State<DealerTile> {
       onTap: widget.onTap,
       child: Container(
         margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
-        // width: 200,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary,
           borderRadius: BorderRadius.circular(12),
@@ -98,10 +115,26 @@ class _DealerTileState extends State<DealerTile> {
 
                   // button to add to favorites
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       setState(() {
                         isFavorited = !isFavorited;
                       });
+
+                      try {
+                        await ApiService.toggleFavorite(userId!, widget.dealer.id, isFavorited);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(isFavorited
+                                ? '${widget.dealer.name} added to favorites'
+                                : '${widget.dealer.name} removed from favorites'),
+                          ),
+                        );
+                      } catch (e) {
+                        // Handle error
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to update favorite status')),
+                        );
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.all(20),

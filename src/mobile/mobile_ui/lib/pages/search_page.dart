@@ -6,6 +6,7 @@ import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/models/dealer.dart';
 import 'package:mobile_ui/pages/dealer_cars_page.dart';
 import 'package:mobile_ui/services/api_service.dart';
+import 'package:mobile_ui/services/auth_service.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -19,12 +20,35 @@ class _SearchPageState extends State<SearchPage> {
   bool _isLoading = false;
   List<Car> _dealerCars = [];
   Dealer? _dealer;
+  List<Dealer> favoriteDealers = [];
+
+  void loadFavorites() async {
+    try {
+      final token = await AuthService.getToken();
+      if (token == null) {
+        throw Exception("User is not logged in");
+      }
+
+      final userId = await AuthService.getUserIdFromToken(token);
+      if (userId == null) {
+        throw Exception("Invalid user ID");
+      }
+      final dealers = await ApiService.getFavoriteDealers(userId);
+      setState(() {
+        favoriteDealers = dealers;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to load favorites: $e")));
+    }
+  }
 
   void _searchDealerCars() async {
     setState(() {
       _isLoading = true;
       _dealerCars = [];
       _dealer = null;
+      loadFavorites();
     });
 
     try {
@@ -35,6 +59,15 @@ class _SearchPageState extends State<SearchPage> {
       final carsJson = response['cars'];
 
       _dealer = Dealer.fromJson(dealerJson);
+
+      if (_dealer != null) {
+        for (var favorite in favoriteDealers) {
+          if (favorite.id == _dealer!.id) {
+            _dealer!.isFavorited = true;
+            break;
+          }
+        }
+      }
 
       _dealerCars = carsJson.map<Car>((json) => Car.fromJson(json)).toList();
 
@@ -111,14 +144,13 @@ class _SearchPageState extends State<SearchPage> {
                     return DealerTile(
                       dealer: dealer,
                       onTap: () {
-                        Navigator.pop(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => DealerCarsPage(
                               cars: _dealerCars,
                               name: dealer.name,
-                              parentRoute: '/home_page',
+                              parentRoute: '/search_page',
                             ),
                           ),
                         );

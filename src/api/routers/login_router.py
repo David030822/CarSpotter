@@ -25,7 +25,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "sub": data["sub"]})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 @login_router.post("/login")
@@ -38,7 +38,7 @@ def login_user(request: LoginRequest, db: Session = Depends(get_db)):
         if not verify_password(request.password, user.password):
             raise HTTPException(status_code=401, detail="Invalid email or password")
 
-        access_token = create_access_token(data={"sub": user.email})
+        access_token = create_access_token(data={"sub": user.id})
 
         return {"access_token": access_token, "token_type": "bearer", "user_id": user.id}
     except Exception as e:

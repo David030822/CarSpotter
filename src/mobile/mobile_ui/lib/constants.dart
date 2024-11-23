@@ -63,6 +63,7 @@ List<User> getUserList(){
 
 List<Dealer> dealers = [
   Dealer(
+    id: 0,
     name: 'David BYS\n     Cars',
     location: 'Ivanesti',
     activeSince: 2024,
@@ -71,6 +72,7 @@ List<Dealer> dealers = [
     isFavorited: true
   ),
   Dealer(
+    id: 0,
     name: 'Cristal Auto',
     location: 'Targu Mures',
     activeSince: 2016,
@@ -79,6 +81,7 @@ List<Dealer> dealers = [
     isFavorited: false
   ),
   Dealer(
+    id: 0,
     name: 'Royal\nAutomobile\nMures',
     location: 'Targu Mures',
     activeSince: 2020,

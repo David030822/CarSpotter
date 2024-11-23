@@ -75,11 +75,42 @@ def get_cars_and_dealer_by_dealer_name(db: Session, dealer_name: str):
 
     return {
         "dealer": {
+            "id": dealer.id,
             "name": dealer.name,
             "location": dealer.locality,
             "active_since": dealer.active_since,
             "image_url": dealer.image_url,
         },
+        "cars": [
+            {
+                "id": car.id,
+                "model": car.model,
+                "km": car.km,
+                "year": car.year,
+                "price": car.price,
+                "combustible": car.combustible,
+                "gearbox": car.gearbox,
+                "body_type": car.body_type,
+                "cylinder_capacity": car.cylinder_capacity,
+                "power": car.power,
+                "dateof_post": car.dateof_post,
+                "id_post": car.id_post,
+                "img_url": car.img_url,
+            }
+            for car in cars
+        ]
+    }
+
+def get_cars_by_dealer_id(db: Session, dealer_id: int):
+
+    cars = db.query(Car).filter_by(dealer_id=dealer_id).all()
+    if not cars:
+        raise ValueError(f"No cars found for dealer '{dealer_id}'.")
+    
+    sold_car_ids = [soldCar.car_id for soldCar in db.query(SoldCar)]
+    cars = [car for car in cars if car.id not in sold_car_ids]
+
+    return {
         "cars": [
             {
                 "id": car.id,

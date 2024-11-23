@@ -17,7 +17,9 @@ CREATE TABLE `User` (
     `password` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
     `phone` BIGINT NOT NULL,
-    `profile_url` VARCHAR(255) NOT NULL
+    `profile_url` VARCHAR(255) NOT NULL,
+    CONSTRAINT `unique_email` UNIQUE (`email`)
+
 );
 
 CREATE TABLE `Cars` (
@@ -66,9 +68,9 @@ CREATE TABLE `AppLogs` (
 
 CREATE TABLE `Favourites` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `car_id` BIGINT UNSIGNED NOT NULL, 
-    `user_id` BIGINT UNSIGNED NULL, 
-    CONSTRAINT `favourites_car_id_foreign` FOREIGN KEY(`car_id`) REFERENCES `Cars`(`id`),
+    `dealer_id` BIGINT UNSIGNED NOT NULL, 
+    `user_id` BIGINT UNSIGNED NOT NULL, 
+    CONSTRAINT `favourites_car_id_foreign` FOREIGN KEY(`dealer_id`) REFERENCES `Dealer`(`id`),
     CONSTRAINT `favourites_user_id_foreign` FOREIGN KEY(`user_id`) REFERENCES `User`(`id`)
 );
 

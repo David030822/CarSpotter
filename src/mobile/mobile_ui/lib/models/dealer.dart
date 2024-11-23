@@ -1,6 +1,7 @@
 import 'package:mobile_ui/models/car.dart';
 
 class Dealer {
+  final int id;
   final String name;
   final String location;
   final int activeSince;
@@ -9,6 +10,7 @@ class Dealer {
   bool isFavorited;
 
   Dealer({
+    required this.id,
     required this.name,
     required this.location,
     required this.activeSince,
@@ -24,13 +26,13 @@ class Dealer {
         : [];
 
     return Dealer(
+      id: json['id'] ?? 0,
       name: json['name'] ?? '',
       location: json['location'] ?? '',
       activeSince: int.tryParse(json['active_since'].toString()) ?? 0,
       imagePath: json['image_url'] ?? '',
       cars: carsList,
-      isFavorited: false,
+      isFavorited: json['is_favorited'] ?? false,
     );
   }
 }
-

@@ -13,6 +13,7 @@ class Dealer(Base):
     image_url = Column(String(255), nullable=True)     
 
     cars = relationship("Car", back_populates="dealer")
+    favourites = relationship("Favourite", back_populates="dealer")
 
 
 class User(Base):
@@ -23,7 +24,7 @@ class User(Base):
     last_name = Column(String(255), nullable=False)
     dealer_id = Column(BigInteger, ForeignKey('Dealer.id'), nullable=True)
     password = Column(String(255), nullable=False)
-    email = Column(String(255), nullable=False)
+    email = Column(String(255), nullable=False, unique=True)
     phone = Column(BigInteger, nullable=False)
     profile_url = Column(String(255), nullable=False)
 
@@ -53,7 +54,6 @@ class Car(Base):
 
     dealer = relationship("Dealer", back_populates="cars")
     sold_cars = relationship("SoldCar", back_populates="car")
-    favourites = relationship("Favourite", back_populates="car")
     own_cars = relationship("OwnCar", back_populates="car")
 
 
@@ -95,10 +95,10 @@ class Favourite(Base):
     __tablename__ = 'Favourites'
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    car_id = Column(BigInteger, ForeignKey('Cars.id'), nullable=False)
-    user_id = Column(BigInteger, ForeignKey('User.id'), nullable=True)
+    dealer_id = Column(BigInteger, ForeignKey('Dealer.id'), nullable=False)
+    user_id = Column(BigInteger, ForeignKey('User.id'), nullable=False)
 
-    car = relationship("Car", back_populates="favourites")
+    dealer = relationship("Dealer", back_populates="favourites")
     user = relationship("User", back_populates="favourites")
 
 

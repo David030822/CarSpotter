@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mobile_ui/services/auth_service.dart';
+import 'package:mobile_ui/models/dealer.dart';
+import 'package:mobile_ui/models/car.dart';
 
 class ApiService {
-  static const String baseUrl = "https://caf5-62-210-243-45.ngrok-free.app";
+  static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
@@ -10,13 +13,27 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return Map<String, dynamic>.from(jsonDecode(response.body)); 
+      return Map<String, dynamic>.from(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load cars: ${response.body}');
     }
   }
 
-   // Regisztrációs API hívás
+    static Future<List<Car>> getCarsByDealerId(int dealerId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/dealer_id/$dealerId/cars'),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      final List<dynamic> carsJson = jsonResponse['cars']; 
+      return carsJson.map((json) => Car.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load cars: ${response.body}');
+    }
+  }
+
+  // Regisztrációs API hívás
   static Future<Map<String, dynamic>> registerUser({
     required String firstName,
     required String lastName,
@@ -49,7 +66,6 @@ class ApiService {
     }
   }
 
-
   static Future<bool> loginUser(String email, String password) async {
     final String url = "$baseUrl/login";
 
@@ -62,14 +78,42 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        // await saveToken(data['access_token']);
-        return true; 
+        AuthService.saveToken(data['access_token']);
+        return true;
       } else {
         final errorResponse = jsonDecode(response.body);
         throw Exception(errorResponse['detail'] ?? "Invalid credentials");
       }
     } catch (e) {
       throw Exception("Error during login: $e");
+    }
+  }
+
+  // Add or remove a dealer from favorites
+  static Future<void> toggleFavorite(
+      int userId, int dealerId, bool isFavorited) async {
+    final String url = "$baseUrl/user/$userId/favorite/$dealerId";
+
+    final response = !isFavorited
+        ? await http.delete(Uri.parse(url)) // Assuming DELETE removes favorite
+        : await http.post(Uri.parse(url)); // POST adds to favorites
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update favorite status');
+    }
+  }
+
+  // Get favorite dealers for a user by their userId
+  static Future<List<Dealer>> getFavoriteDealers(int userId) async {
+    final url = Uri.parse('$baseUrl/user/$userId/favorites');
+    final response = await http.get(url, headers: {"Authorization": "Bearer your_token_here"});
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      final List<dynamic> dealersJson = jsonResponse['favorites']; 
+      return dealersJson.map((json) => Dealer.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load favorite dealers');
     }
   }
 }
