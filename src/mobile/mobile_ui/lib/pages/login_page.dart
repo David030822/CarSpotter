@@ -9,6 +9,7 @@ import 'package:mobile_ui/pages/forgot_password_page.dart';
 import 'package:mobile_ui/pages/google_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/register_page.dart';
+import 'package:mobile_ui/ApiService/api_login_service.dart';
 // import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -113,13 +114,38 @@ class _LoginPageState extends State<LoginPage> {
                       MyButton(
                         text: 'Sign In',
                         onTap: () async {
+                           final email = usernameController.text;
+                           final password = passwordController.text;
+
+                           if (email.isEmpty || password.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Please enter both email and password')),
+                            );
+                            return;
+                          }
+
+                           bool isLoggedIn = await loginUser(email, password, context); //called loginUser to the backend
+
                           // await context.read<UserData>().login(usernameController.text, passwordController.text, context);
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePage(),
-                            ),
-                          );
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => HomePage(),
+                          //   ),
+                          // );
+                          if (isLoggedIn) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(),
+                              ),
+                            );
+                          } else {
+                            
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Invalid username or password')),
+                            );
+                          }
                         },
                       ),
 

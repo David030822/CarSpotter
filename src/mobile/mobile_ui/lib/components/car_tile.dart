@@ -9,7 +9,7 @@ class CarTile extends StatelessWidget {
   final void Function() onTap;
   final void Function()? onButtonTap;
 
-  CarTile({
+  const CarTile({
     super.key,
     required this.car,
     required this.editCar,
@@ -67,7 +67,7 @@ class CarTile extends StatelessWidget {
                         width: 150,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.broken_image, size: 100),
+                            const Icon(Icons.directions_car, size: 100),
                       ),
                     ),
                   ),

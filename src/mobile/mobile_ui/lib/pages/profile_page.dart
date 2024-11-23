@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_ui/components/my_drawer.dart';
+import 'package:mobile_ui/models/user.dart';
 import 'package:mobile_ui/pages/friends_page.dart';
 import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-
+  final User user;
+  const ProfilePage({super.key, required this.user});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ProfilePageState createState() => _ProfilePageState();
 }
 
@@ -24,18 +26,17 @@ class _ProfilePageState extends State<ProfilePage> {
     {
       setState((){
         _image=File(pickedFile.path);  //here the image is set
-      }); 
+      });
     }
   }
 
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.transparent, 
+        backgroundColor: Colors.transparent,
       ),
       drawer: const MyDrawer(),
   
@@ -58,27 +59,31 @@ class _ProfilePageState extends State<ProfilePage> {
               onTap: _pickImage, // to select the image
             
               child : CircleAvatar(
-               radius: 80,
-               backgroundImage: _image == null
-                  ?  AssetImage('assets/images/DavidBysCars.png') //default image
-                  : FileImage(_image!) as ImageProvider<Object>,
+              radius: 80,
+              backgroundImage: _image != null ? FileImage(_image!) as ImageProvider<Object> : null,
+              child: _image == null
+                  ? ClipOval(
+                      child: Image.asset(
+                        widget.user.profileImagePath,
+                        width: 160, // Set a width for the image
+                        height: 160, // Set a height for the image
+                        fit: BoxFit.cover, // Ensures the image fits well within the circular frame
+                      ),
+                    )
+                  : null,
               ),
             ),
               
-            const SizedBox(height: 20),
-            itemProfile('Name','Demeter David', CupertinoIcons.person),
-            const SizedBox(height: 20),
-            itemProfile('Phone','0765176514', CupertinoIcons.phone),
-            const SizedBox(height: 20),
-            itemProfile('Email','demeterdavid@gmail.com', CupertinoIcons.mail),
-          
-        
-           
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+            itemProfile('Name', '${widget.user.firstName} ${widget.user.lastName}' , CupertinoIcons.person),
+            const SizedBox(height: 10),
+            itemProfile('Phone', widget.user.phoneNum, CupertinoIcons.phone),
+            const SizedBox(height: 10),
+            itemProfile('Email', widget.user.email, CupertinoIcons.mail),
+            const SizedBox(height: 10),
         
               GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -112,35 +117,30 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
   
-
     Widget itemProfile(String title, String subtitle, IconData iconData){
-       return  Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      offset: Offset(0,5),
-                      color: Colors.grey.withOpacity(.2),
-                      spreadRadius: 5,
-                      blurRadius: 10,
-                    ),
-                  ],
-              ),
-              margin: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: ListTile(
-                title: Text(title),
-                subtitle: Text(subtitle),
-                leading: Icon(iconData),
-                trailing: Icon(Icons.arrow_forward,color: Colors.grey),
-              
-                      
-                      
-              ),
+       return Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondary,
+                  borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        offset: const Offset(0,5),
+                        color: Colors.grey.withOpacity(.2),
+                        spreadRadius: 5,
+                        blurRadius: 10,
+                      ),
+                    ],
+                ),
+                margin: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: ListTile(
+                  title: Text(title),
+                  subtitle: Text(subtitle),
+                  leading: Icon(iconData),
+                  trailing: const Icon(Icons.arrow_forward,color: Colors.grey),     
+                ),
               ),
             );
      }
-  
 }

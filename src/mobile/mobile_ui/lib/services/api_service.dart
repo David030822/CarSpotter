@@ -2,15 +2,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = "https://d019-51-159-111-55.ngrok-free.app";
+  static const String baseUrl = "http://192.168.180.198:8000";
 
-  static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
+  static Future<List<dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
       Uri.parse('$baseUrl/dealer/$dealerName/cars'),
     );
 
     if (response.statusCode == 200) {
-      return Map<String, dynamic>.from(jsonDecode(response.body));
+      return List.from(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load cars: ${response.body}');
     }

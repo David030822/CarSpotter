@@ -4,9 +4,9 @@ import 'package:mobile_ui/models/dealer.dart';
 class DealerTile extends StatefulWidget {
   final Dealer dealer;
   final void Function() onTap;
-  void Function() onButtonTap;
+  final void Function() onButtonTap;
 
-  DealerTile({
+  const DealerTile({
     super.key,
     required this.dealer,
     required this.onTap,
@@ -14,6 +14,7 @@ class DealerTile extends StatefulWidget {
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _DealerTileState createState() => _DealerTileState();
 }
 
@@ -26,7 +27,7 @@ class _DealerTileState extends State<DealerTile> {
       onTap: widget.onTap,
       child: Container(
         margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
-        width: 200,
+        // width: 200,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary,
           borderRadius: BorderRadius.circular(12),

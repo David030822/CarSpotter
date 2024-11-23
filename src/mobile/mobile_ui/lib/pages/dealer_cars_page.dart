@@ -10,18 +10,18 @@ class DealerCarsPage extends StatefulWidget {
   final String parentRoute;
 
   const DealerCarsPage({
-    Key? key,
+    super.key,
     required this.cars,
     required this.name,
     required this.parentRoute
-  }) : super(key: key);
+  });
 
   @override
   State<DealerCarsPage> createState() => _DealerCarsPageState();
 }
 
 class _DealerCarsPageState extends State<DealerCarsPage> {
-    void editCarBox(Car car) {}
+  void editCarBox(Car car) {}
   void deleteCarBox(Car car) {}
 
   @override
@@ -32,16 +32,7 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: Theme.of(context).colorScheme.inversePrimary,
-        leading: BackButton(
-          onPressed: () {
-            Navigator.pop(context);
-            Navigator.pushNamed(
-              context, widget.parentRoute
-            );
-          },
-        ),
       ),
-      // drawer: myDrawer,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -77,7 +68,7 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
                       editCar: (context) => editCarBox(widget.cars[index]),
                       deleteCar: (context) => deleteCarBox(widget.cars[index]),
                       onTap: () {
-                        Navigator.pop(context);
+                        // Navigator.pop(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(

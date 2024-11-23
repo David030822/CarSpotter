@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_ui/components/my_drawer.dart';
 import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/models/dealer.dart';
-import 'package:mobile_ui/models/friend.dart';
+import 'package:mobile_ui/models/user.dart';
 
 var myDefaultBackgroundColor = Colors.grey[300];
 
@@ -11,6 +11,55 @@ var myAppBar = AppBar(
 );
 
 var myDrawer = const MyDrawer();
+
+List<User> users = [
+  User(
+    firstName: 'David',
+    lastName: 'Demeter',
+    email: 'demeter.david@gmail.com',
+    phoneNum: '0745805425',
+    profileImagePath: 'assets/images/DavidBysCars.png'
+  ),
+  User(
+  firstName: 'Emma',
+  lastName: 'Johnson',
+  email: 'emma.johnson@gmail.com',
+  phoneNum: '0765481234',
+  profileImagePath: '',
+  ),
+  User(
+    firstName: 'Liam',
+    lastName: 'Smith',
+    email: 'liam.smith@gmail.com',
+    phoneNum: '0754123467',
+    profileImagePath: '',
+  ),
+  User(
+    firstName: 'Sophia',
+    lastName: 'Brown',
+    email: 'sophia.brown@gmail.com',
+    phoneNum: '0773219876',
+    profileImagePath: '',
+  ),
+  User(
+    firstName: 'Noah',
+    lastName: 'Davis',
+    email: 'noah.davis@gmail.com',
+    phoneNum: '0723456789',
+    profileImagePath: '',
+  ),
+  User(
+    firstName: 'Ava',
+    lastName: 'Taylor',
+    email: 'ava.taylor@gmail.com',
+    phoneNum: '0734567890',
+    profileImagePath: '',
+  ),
+];
+
+List<User> getUserList(){
+  return users;
+}
 
 List<Dealer> dealers = [
   Dealer(
@@ -43,40 +92,13 @@ List<Dealer> getDealerList() {
   return dealers;
 }
 
-List<Friend> friends = [
-  Friend(
-    name: 'Mitch',
-    email: 'mitchkoko22@gmail.com'
-  ),
-  Friend(
-    name: 'Sarah',
-    email: 'sarahjones98@yahoo.com'
-  ),
-  Friend(
-    name: 'David',
-    email: 'davidbrown23@hotmail.com'
-  ),
-  Friend(
-    name: 'Emily',
-    email: 'emilysmith11@gmail.com'
-  ),
-  Friend(
-    name: 'Alex',
-    email: 'alexjohnson77@outlook.com'
-  ),
-];
-
-List<Friend> getFriendList() {
-  return friends;
-}
-
 List<Car> myCars = [
   Car(
     name: 'Audi A6',
     year: 2018,
     kilometers: 137521,
     fuelType: 'Diesel',
-    price: 29500,
+    price: 27500,
     imagePath: 'assets/images/AudiA6.jpg',
     gearbox: 'Automatic',
     chassis: 'Combi',

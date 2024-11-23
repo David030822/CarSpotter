@@ -96,7 +96,7 @@ class _SearchPageState extends State<SearchPage> {
                         _searchController.text.isNotEmpty)
                       Text(
                         'No cars found for "${_searchController.text}".',
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                   ],
                 ),

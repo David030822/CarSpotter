@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class Car {
   final String name;
   final String fuelType;

@@ -39,7 +39,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
                   return DealerTile(
                     dealer: dealer,
                     onTap: () {
-                      Navigator.pop(context);
+                      // Navigator.pop(context);
                       Navigator.push(
                         context,
                         MaterialPageRoute(

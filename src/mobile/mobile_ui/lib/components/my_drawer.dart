@@ -2,11 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:mobile_ui/components/drawer_tile.dart';
+import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/pages/about_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/login_page.dart';
 import 'package:mobile_ui/pages/profile_page.dart';
 import 'package:mobile_ui/pages/settings_page.dart';
+import 'package:mobile_ui/pages/statistics_page.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
@@ -51,11 +53,25 @@ class MyDrawer extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProfilePage(),
+                        builder: (context) => ProfilePage(user: users[0]),
                       ),
                     );
-                  } 
+                  }, 
                 ),
+                  DrawerTile(
+                  title: 'S T A T I S T I S T I C S',
+                  leading: const Icon(Icons.show_chart),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StatisticsPage(),
+                      ),
+                    );
+                  },
+                ),
+        
         
                 // settings tile
                 DrawerTile(
