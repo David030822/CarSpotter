@@ -21,7 +21,7 @@ class User(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     first_name = Column(String(255), nullable=False)
     last_name = Column(String(255), nullable=False)
-    is_dealer = Column(Boolean, nullable=False)
+    dealer_id = Column(BigInteger, ForeignKey('Dealer.id'), nullable=True)
     password = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False)
     phone = Column(BigInteger, nullable=False)

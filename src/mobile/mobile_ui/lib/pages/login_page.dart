@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:mobile_ui/components/my_button.dart';
 import 'package:mobile_ui/components/my_text_field.dart';
@@ -9,8 +7,7 @@ import 'package:mobile_ui/pages/forgot_password_page.dart';
 import 'package:mobile_ui/pages/google_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/register_page.dart';
-import 'package:mobile_ui/ApiService/api_login_service.dart';
-// import 'package:provider/provider.dart';
+import 'package:mobile_ui/services/api_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,15 +17,44 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // text editing controllers
-  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  // Login function
+  Future<void> loginUser() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please enter both email and password")),
+      );
+      return;
+    }
+
+    try {
+      bool success = await ApiService.loginUser(email, password);
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Login successful!")),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Login failed: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      resizeToAvoidBottomInset: true, // Automatically adjust when the keyboard appears
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -63,16 +89,16 @@ class _LoginPageState extends State<LoginPage> {
 
                       SizedBox(height: 25),
 
-                      // username textfield
+                      // Email textfield
                       MyTextField(
-                        controller: usernameController,
-                        hintText: 'Username',
+                        controller: emailController,
+                        hintText: 'Email',
                         obscureText: false,
                       ),
 
                       SizedBox(height: 10),
 
-                      // password textfield
+                      // Password textfield
                       MyTextField(
                         controller: passwordController,
                         hintText: 'Password',
@@ -108,48 +134,16 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
 
+                      
                       SizedBox(height: 25),
 
                       // sign in button
                       MyButton(
                         text: 'Sign In',
-                        onTap: () async {
-                           final email = usernameController.text;
-                           final password = passwordController.text;
-
-                           if (email.isEmpty || password.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Please enter both email and password')),
-                            );
-                            return;
-                          }
-
-                           bool isLoggedIn = await loginUser(email, password, context); //called loginUser to the backend
-
-                          // await context.read<UserData>().login(usernameController.text, passwordController.text, context);
-                          // Navigator.pushReplacement(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => HomePage(),
-                          //   ),
-                          // );
-                          if (isLoggedIn) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(),
-                              ),
-                            );
-                          } else {
-                            
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Invalid username or password')),
-                            );
-                          }
-                        },
+                        onTap: loginUser,
                       ),
 
-                      SizedBox(height: 50),
+                      SizedBox(height: 25),
 
                       // or continue with
                       Padding(
@@ -240,7 +234,6 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(width: 4),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pop(context);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -248,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               );
                             },
-                            child: Text(
+                            child: const Text(
                               'Register now',
                               style: TextStyle(
                                 color: Colors.blue,
