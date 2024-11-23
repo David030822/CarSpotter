@@ -7,6 +7,10 @@ class Dealer(Base):
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
+    inventory_name = Column(String(255), nullable=True)  
+    locality = Column(String(255), nullable=True)        
+    active_since = Column(String(255), nullable=True)     
+    image_url = Column(String(255), nullable=True)     
 
     cars = relationship("Car", back_populates="dealer")
 
@@ -45,7 +49,7 @@ class Car(Base):
     dateof_post = Column(Date, nullable=False)
     id_post = Column(BigInteger, nullable=False)
     dealer_id = Column(BigInteger, ForeignKey('Dealer.id'), nullable=False)
-    img_url = Column(String(255), nullable=False)
+    img_url = Column(String(500), nullable=False)
 
     dealer = relationship("Dealer", back_populates="cars")
     sold_cars = relationship("SoldCar", back_populates="car")
@@ -57,7 +61,7 @@ class SoldCar(Base):
     __tablename__ = 'SoldCars'
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    card_id = Column(BigInteger, ForeignKey('Cars.id'), nullable=False)
+    car_id = Column(BigInteger, ForeignKey('Cars.id'), nullable=False)
     sold_date = Column(Date, nullable=False)
     sold_price = Column(Float, nullable=False)
 

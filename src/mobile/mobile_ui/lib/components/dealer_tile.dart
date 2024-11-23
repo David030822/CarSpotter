@@ -42,7 +42,7 @@ class _DealerTileState extends State<DealerTile> {
                   padding: const EdgeInsets.all(8.0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
+                    child: Image.network(
                       widget.dealer.imagePath,
                       height: 100,
                       width: 150,

@@ -5,7 +5,7 @@ class Dealer {
   final String location;
   final int activeSince;
   final String imagePath;
-  List<Car> cars;
+  final List<Car> cars;
   bool isFavorited;
 
   Dealer({
@@ -14,6 +14,23 @@ class Dealer {
     required this.activeSince,
     required this.imagePath,
     required this.cars,
-    required this.isFavorited
+    required this.isFavorited,
   });
+
+  factory Dealer.fromJson(Map<String, dynamic> json) {
+    var carsJson = json['cars'];
+    List<Car> carsList = carsJson != null
+        ? List<Car>.from(carsJson.map((carJson) => Car.fromJson(carJson)))
+        : [];
+
+    return Dealer(
+      name: json['name'] ?? '',
+      location: json['location'] ?? '',
+      activeSince: int.tryParse(json['active_since'].toString()) ?? 0,
+      imagePath: json['image_url'] ?? '',
+      cars: carsList,
+      isFavorited: false,
+    );
+  }
 }
+

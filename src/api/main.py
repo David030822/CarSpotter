@@ -1,10 +1,9 @@
 from fastapi import FastAPI
-from api.controllers.dealer_controller import router 
+from api.routers.dealer_router import dealer_router
 
 app = FastAPI()
 
-# Regisztráljuk a routert
-app.include_router(router)
+app.include_router(dealer_router)
 
 @app.get("/")
 def root():
