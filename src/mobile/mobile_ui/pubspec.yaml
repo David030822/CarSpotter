@@ -6,10 +6,15 @@ version: 0.1.0
 environment:
   sdk: ^3.5.1
 
+flutter_native_splash:
+  image: asstes/images/app_logo_rounded.png
+  android: true
+  ios: true
+
 dependencies:
   flutter:
     sdk: flutter
-  flutter_native_splash:
+  flutter_native_splash: ^2.0.0
   syncfusion_flutter_charts: ^20.4.40
   cupertino_icons: ^1.0.2
   provider: ^6.0.5
