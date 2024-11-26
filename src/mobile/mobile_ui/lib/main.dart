@@ -13,13 +13,22 @@ import 'package:mobile_ui/responsive/responsive_layout.dart';
 import 'package:mobile_ui/responsive/tablet_scaffold.dart';
 import 'package:mobile_ui/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 
-void main() {
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized(); //initializing the FireBase before the app starts
   // FlutterNativeSplash.removeAfter(initialization);
+  try{
+       await Firebase.initializeApp(); //initilaize firebase here
+  }catch (e) {
+    print("Firebase initialization failed: $e");
+  }
+ 
   runApp(
     MultiProvider(
       providers: [
-        
         // Theme Provider
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ],
