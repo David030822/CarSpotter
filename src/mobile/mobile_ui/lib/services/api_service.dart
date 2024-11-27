@@ -40,8 +40,10 @@ class ApiService {
     required String email,
     required String phone,
     required String password,
+    String dealerInventoryName = "",
     String profileUrl =
         "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+    
   }) async {
     final url = Uri.parse('$baseUrl/register');
 
@@ -55,6 +57,7 @@ class ApiService {
         "phone": int.tryParse(phone) ?? 0,
         "password": password,
         "profile_url": profileUrl,
+        "dealer_inventory_name": dealerInventoryName,
       }),
     );
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_ui/components/my_button.dart';
 import 'package:mobile_ui/components/my_text_field.dart';
-import 'package:mobile_ui/pages/home_page.dart';
+import 'package:mobile_ui/pages/login_page.dart';
 import 'package:mobile_ui/services/api_service.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -18,6 +18,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final dealerNameController = TextEditingController();
+
+  bool isLoading = false;
 
   // Handle user registration
   Future<void> handleRegister() async {
@@ -41,28 +44,38 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // Attempt registration via ApiService
+    setState(() {
+      isLoading = true;
+    });
+
     try {
+      // Attempt registration via ApiService
       final result = await ApiService.registerUser(
         firstName: firstNameController.text,
         lastName: lastNameController.text,
         email: emailController.text,
         phone: phoneController.text,
         password: passwordController.text,
+        dealerInventoryName: dealerNameController.text,
       );
 
-      // Navigate to HomePage if registration is successful
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Registration successful: ${result['message']}")),
+        SnackBar(
+            content: Text("Registration successful: ${result['message']}")),
       );
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Registration failed: $e")),
       );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -105,65 +118,57 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       const SizedBox(height: 25),
 
-                      // First name
+                      // Input fields
                       MyTextField(
                         controller: firstNameController,
                         hintText: 'First Name',
                         obscureText: false,
                       ),
-
                       const SizedBox(height: 10),
-
-                      // Last name
                       MyTextField(
                         controller: lastNameController,
                         hintText: 'Last Name',
                         obscureText: false,
                       ),
-
                       const SizedBox(height: 10),
-
-                      // Email
                       MyTextField(
                         controller: emailController,
                         hintText: 'Email',
                         obscureText: false,
                       ),
-
                       const SizedBox(height: 10),
-
-                      // Phone
                       MyTextField(
                         controller: phoneController,
                         hintText: 'Phone',
                         obscureText: false,
                       ),
-
                       const SizedBox(height: 10),
-
-                      // Password
                       MyTextField(
                         controller: passwordController,
                         hintText: 'Password',
                         obscureText: true,
                       ),
-
                       const SizedBox(height: 10),
-
-                      // Confirm password
                       MyTextField(
                         controller: confirmPasswordController,
                         hintText: 'Confirm Password',
                         obscureText: true,
                       ),
-
+                      const SizedBox(height: 25),
+                      MyTextField(
+                        controller: dealerNameController,
+                        hintText: 'Dealer inventory name if you are a dealer',
+                        obscureText: false,
+                      ),
                       const SizedBox(height: 25),
 
-                      // Register button
-                      MyButton(
-                        text: 'Register Now',
-                        onTap: handleRegister, // Call handleRegister when tapped
-                      ),
+                      // Register button or progress indicator
+                      isLoading
+                          ? const CircularProgressIndicator() // Show progress indicator
+                          : MyButton(
+                              text: 'Register Now',
+                              onTap: handleRegister,
+                            ),
                     ],
                   ),
                 ),

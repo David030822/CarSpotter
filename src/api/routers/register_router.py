@@ -3,7 +3,8 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from db.database import get_db
 from passlib.context import CryptContext
-from db.tables.models import User
+from db.tables.models import User, Dealer
+from api.services.service import insert_cars_and_dealer_by_dealer_name
 
 
 register_router = APIRouter()
@@ -17,6 +18,7 @@ class RegisterRequest(BaseModel):
     phone: int
     password: str
     profile_url: str = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+    dealer_inventory_name: str = ""
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -28,14 +30,30 @@ def register_user(request: RegisterRequest, db: Session = Depends(get_db)):
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered.")
         
-        new_user = User(
-            first_name=request.first_name,
-            last_name=request.last_name,
-            email=request.email,
-            phone=request.phone,
-            password=hash_password(request.password),
-            profile_url=request.profile_url,
-        )
+        new_user_data = {
+            "first_name": request.first_name,
+            "last_name": request.last_name,
+            "email": request.email,
+            "phone": request.phone,
+            "password": hash_password(request.password),
+            "profile_url": request.profile_url
+        }
+        
+        if request.dealer_inventory_name and request.dealer_inventory_name.strip():
+            dealer = db.query(Dealer).filter(Dealer.inventory_name == request.dealer_inventory_name).first()
+            if not dealer:
+                insert_cars_and_dealer_by_dealer_name(db, request.dealer_inventory_name)
+                dealer = db.query(Dealer).filter(Dealer.inventory_name == request.dealer_inventory_name).first()
+                if not dealer:
+                    raise HTTPException(status_code=400, detail="Not a valid dealer.")
+            if dealer:
+                user = db.query(User).filter(User.dealer_id == dealer.id).first()
+                if user:
+                    raise HTTPException(status_code=400, detail="Dealer name is already used by another user")
+                new_user_data["dealer_id"] = dealer.id
+
+        new_user = User(**new_user_data)
+
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
