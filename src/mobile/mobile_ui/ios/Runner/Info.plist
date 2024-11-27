@@ -50,6 +50,12 @@
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UIStatusBarHidden</key>
+
+		<key>NSAppleMusicUsageDescription</key>
+		<string>We need access to your Apple Music account to provide personalized recommendations.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>We need access to your camera for scanning QR codes.</string>
+
 		<false/>
 	</dict>
 </plist>

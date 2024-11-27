@@ -5,7 +5,7 @@ import 'package:mobile_ui/models/dealer.dart';
 import 'package:mobile_ui/models/car.dart';
 
 class ApiService {
-  static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";
+  static const String baseUrl = "https://yearly-faithful-doberman.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
