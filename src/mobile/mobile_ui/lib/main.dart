@@ -15,6 +15,7 @@ import 'package:mobile_ui/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_ui/pages/chatbot_page.dart';
 
 
 void main() async{
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget {
         '/main_page': (context) => const MainPage(),
         '/search_page': (context) => const SearchPage(),
         '/favourites_page': (context) => const FavouritesPage(),
+        '/chatbot_page': (context) => const ChatbotPage(), 
       },
     );
   }
