@@ -38,3 +38,4 @@ A projekt dokumentációja tartalmazza az alábbiakat:
 1. Klónozd a projektet:
    ```bash
    git clone <repo_url>
+2.
