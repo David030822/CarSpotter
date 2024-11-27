@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mobile_ui/components/my_button.dart';
 import 'package:mobile_ui/components/my_text_field.dart';
 import 'package:mobile_ui/components/square_tile.dart';
-import 'package:mobile_ui/pages/apple_page.dart';
 import 'package:mobile_ui/pages/forgot_password_page.dart';
 import 'package:mobile_ui/pages/google_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
@@ -177,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       SizedBox(height: 50),
 
-                      // google + apple sign in buttons
+                      // google 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -192,31 +191,17 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               );
                             },
-                            child: SquareTile(
+                            child: const SquareTile(
                               height: 40,
                               imagePath: 'assets/images/google.png',
                             ),
                           ),
 
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
 
-                          // apple button
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ApplePage(),
-                                ),
-                              );
-                            },
-                            child: SquareTile(
-                              height: 40,
-                              imagePath: 'assets/images/apple.png',
-                            ),
-                          ),
+  
                         ],
+                      
                       ),
 
                       const SizedBox(height: 50),
