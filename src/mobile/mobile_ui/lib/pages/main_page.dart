@@ -6,7 +6,8 @@ import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/pages/car_details_page.dart';
 import 'package:mobile_ui/pages/statistics_page.dart';
-import 'package:mobile_ui/pages/chatbot_page.dart';
+import 'package:mobile_ui/services/api_service.dart';
+import 'package:mobile_ui/services/auth_service.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,86 +17,101 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  bool _isLoading = false;
+  List<Car> _myCars = [];
   void editCarBox(Car car) {}
   void deleteCarBox(Car car) {}
+
+  void initState() {
+    super.initState();
+    loadOwnCars();
+  }
+
+  void loadOwnCars() async {
+    setState(() {
+      _isLoading = true;
+      _myCars = [];
+    });
+
+    try {
+      final token = await AuthService.getToken();
+      if (token == null) {
+        throw Exception("User is not logged in");
+      }
+      final userId = await AuthService.getUserIdFromToken(token);
+      if (userId == null) {
+        throw Exception("Invalid user ID");
+      }
+      _myCars = await ApiService.getOwnCars(userId);
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      drawer: MyDrawer(),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          // Statistics Button
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => StatisticsPage()), //ezt ki kell cserelni
-              );
-            },
-            elevation: 0,
-            backgroundColor: Theme.of(context).colorScheme.tertiary,
-            child: const Icon(Icons.add),
-          ),
-          SizedBox(width: 16), 
-          // Chatbot Button
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ChatbotPage()),
-              );
-            },
-            elevation: 0,
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            child: const Icon(Icons.chat),
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Your Cars',
-              style: GoogleFonts.dmSerifText(
-                fontSize: 36,
-                color: Theme.of(context).colorScheme.inversePrimary,
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 80.0),
-                child: ListView.builder(
-                  itemCount: 3,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  itemBuilder: (context, index) {
-                    // Get a car from the list
-                    Car car = getMyCars()[index];
-                    return CarTile(
-                      car: car,
-                      editCar: (context) => editCarBox(car),
-                      deleteCar: (context) => deleteCarBox(car),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CarDetailsPage(car: car),
-                          ),
-                        );
-                      },
-                      onButtonTap: () {},
-                    );
-                  },
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        drawer: MyDrawer(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => StatisticsPage()),
+            );
+          },
+          elevation: 0,
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
+          child: const Icon(Icons.add),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Your Cars',
+                  style: GoogleFonts.dmSerifText(
+                    fontSize: 36,
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  )),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 80.0),
+                  child: ListView.builder(
+                    itemCount: _myCars.length,
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      
+                      Car car = _myCars[index];
+
+                      return CarTile(
+                        car: car,
+                        editCar: (context) => editCarBox(car),
+                        deleteCar: (context) => deleteCarBox(car),
+                        onTap: () {
+                          // Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CarDetailsPage(car: car),
+                            ),
+                          );
+                        },
+                        onButtonTap: () {},
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+            ],
+          ),
+        ));
   }
 }

@@ -1,3 +1,22 @@
-# MySQL configuration files (add sensitive files, if any)
-*.sql
-*.db
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environment
+venv/
+ENV/
+.env
+.venv/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Logs and debug files
+*.log
+*.pot
+*.mo
+
+# IDE specific
+.vscode/
+.idea/

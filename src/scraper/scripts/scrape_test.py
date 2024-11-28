@@ -171,7 +171,7 @@ def scrape_dealer_inventory(dealer_name, max_pages=None):
     dealer_data = {
         'name': d_name,
         'inventory_name': dealer_name,
-        'locality': locality,
+        'location': locality,
         'active_since': since,
         'image_url': dealer_image_url
     }
@@ -182,8 +182,8 @@ def scrape_dealer_inventory(dealer_name, max_pages=None):
     return result
 
 # Példa használat
-# dealer_name = 'apaniasi'
-dealer_name = 'atp-exodus'
+dealer_name = 'apaniasi'
+# dealer_name = 'atp-exodus'
 
 start_time = time.time()
 scraped_data = scrape_dealer_inventory(dealer_name)
@@ -201,7 +201,7 @@ if scraped_data:
                 f"Body Type: {car['body_type']}, Engine Capacity: {car['cylinder_capacity']}, "
                 f"Power: {car['power']}, Post Date: {car['dateof_post']}, Post ID: {car['id_post']}, Image Link: {car['img_url']}")
             
-        print(f"Name: {dealer_data['name']}, Inventory Name: {dealer_data['inventory_name']}, Locality: {dealer_data['locality']}, Since: {dealer_data['active_since']}, Dealer image: {dealer_data['image_url']}")
+        print(f"Name: {dealer_data['name']}, Inventory Name: {dealer_data['inventory_name']}, Locality: {dealer_data['location']}, Since: {dealer_data['active_since']}, Dealer image: {dealer_data['image_url']}")
     else:
         print(scraped_data)
 else:

@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from db.database import get_db
 from passlib.context import CryptContext
-from db.tables.models import User, Dealer
+from db.tables.models import User, Dealer, Car, OwnCar
 from api.services.service import insert_cars_and_dealer_by_dealer_name
 
 
@@ -46,17 +46,41 @@ def register_user(request: RegisterRequest, db: Session = Depends(get_db)):
                 dealer = db.query(Dealer).filter(Dealer.inventory_name == request.dealer_inventory_name).first()
                 if not dealer:
                     raise HTTPException(status_code=400, detail="Not a valid dealer.")
-            if dealer:
-                user = db.query(User).filter(User.dealer_id == dealer.id).first()
-                if user:
-                    raise HTTPException(status_code=400, detail="Dealer name is already used by another user")
-                new_user_data["dealer_id"] = dealer.id
+                
+            user = db.query(User).filter(User.dealer_id == dealer.id).first()
+            if user:
+                raise HTTPException(status_code=400, detail="Dealer name is already used by another user")
+            new_user_data["dealer_id"] = dealer.id
 
-        new_user = User(**new_user_data)
+            new_user = User(**new_user_data)
+            db.add(new_user)
+            db.commit() 
+            db.refresh(new_user)
 
-        db.add(new_user)
+            cars = db.query(Car).filter(Car.dealer_id == dealer.id)
+            for car in cars:
+                own_car = OwnCar(
+                    user_id=new_user.id, 
+                    model=car.model,
+                    km=car.km,
+                    year=car.year,
+                    price=car.price,
+                    combustible=car.combustible,
+                    gearbox=car.gearbox,
+                    body_type=car.body_type,
+                    cylinder_capacity=car.cylinder_capacity,
+                    power=car.power,
+                    dateof_post=car.dateof_post,
+                    img_url=car.img_url
+                )
+                db.add(own_car)
+        else:
+            new_user = User(**new_user_data)
+            db.add(new_user)
+            db.commit()
+            db.refresh(new_user)
+
         db.commit()
-        db.refresh(new_user)
         return {"message": "User registered successfully", "user_id": new_user.id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")

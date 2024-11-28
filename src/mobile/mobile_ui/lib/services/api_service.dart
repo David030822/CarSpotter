@@ -5,7 +5,7 @@ import 'package:mobile_ui/models/dealer.dart';
 import 'package:mobile_ui/models/car.dart';
 
 class ApiService {
-  static const String baseUrl = "https://yearly-faithful-doberman.ngrok-free.app";
+  static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
@@ -19,7 +19,8 @@ class ApiService {
     }
   }
 
-    static Future<List<Car>> getCarsByDealerId(int dealerId) async {
+
+  static Future<List<Car>> getCarsByDealerId(int dealerId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/dealer_id/$dealerId/cars'),
     );
@@ -117,6 +118,17 @@ class ApiService {
       return dealersJson.map((json) => Dealer.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load favorite dealers');
+    }
+  }
+
+  static Future<List<Car>> getOwnCars(int userId) async {
+    final response = await http.get(Uri.parse('$baseUrl/user/$userId/owncars'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> carList = jsonDecode(response.body);
+      return carList.map((json) => Car.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load cars: ${response.body}');
     }
   }
 }

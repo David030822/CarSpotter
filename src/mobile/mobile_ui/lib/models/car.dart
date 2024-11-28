@@ -1,7 +1,7 @@
 class Car {
   final String name;
   final String fuelType;
-  final double kilometers;
+  final int kilometers;
   final int year;
   final double price;
   final String chassis;
