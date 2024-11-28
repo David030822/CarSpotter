@@ -170,7 +170,7 @@ def scrape_dealer_inventory(dealer_name, max_pages=None):
     dealer_data = {
         'name': d_name,
         'inventory_name': dealer_name,
-        'locality': locality,
+        'location': locality,
         'active_since': since,
         'image_url': dealer_image_url
     }

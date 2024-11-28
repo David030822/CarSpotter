@@ -8,7 +8,7 @@ class Dealer(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
     inventory_name = Column(String(255), nullable=True)  
-    locality = Column(String(255), nullable=True)        
+    location = Column(String(255), nullable=True)        
     active_since = Column(String(255), nullable=True)     
     image_url = Column(String(255), nullable=True)     
 
@@ -39,7 +39,7 @@ class Car(Base):
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     model = Column(String(255), nullable=False)
-    km = Column(Float, nullable=False)
+    km = Column(BigInteger, nullable=False)
     year = Column(BigInteger, nullable=False)
     price = Column(Float, nullable=False)
     combustible = Column(String(255), nullable=False)
@@ -54,7 +54,6 @@ class Car(Base):
 
     dealer = relationship("Dealer", back_populates="cars")
     sold_cars = relationship("SoldCar", back_populates="car")
-    own_cars = relationship("OwnCar", back_populates="car")
 
 
 class SoldCar(Base):
@@ -72,12 +71,19 @@ class OwnCar(Base):
     __tablename__ = 'OwnCars'
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    car_id = Column(BigInteger, ForeignKey('Cars.id'), nullable=False)
+    model = Column(String(255), nullable=False)
+    km = Column(BigInteger, nullable=False)
+    year = Column(BigInteger, nullable=False)
+    price = Column(Float, nullable=False)
+    combustible = Column(String(255), nullable=False)
+    gearbox = Column(String(255), nullable=False)
+    body_type = Column(String(255), nullable=False)
+    cylinder_capacity = Column(BigInteger, nullable=False)
+    power = Column(BigInteger, nullable=False)
+    dateof_post = Column(Date, nullable=False)
+    img_url = Column(String(500), nullable=False)
     user_id = Column(BigInteger, ForeignKey('User.id'), nullable=False)
-    purchase_date = Column(Date, nullable=False)
-    purchase_price = Column(Float, nullable=False)
 
-    car = relationship("Car", back_populates="own_cars")
     user = relationship("User", back_populates="own_cars")
 
 

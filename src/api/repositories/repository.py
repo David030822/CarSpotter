@@ -29,7 +29,7 @@ def add_car(db: Session, car_data: dict):
     return db_car
 
 
-def add_dealer(db: Session, dealer_name: str, inventory_name: str, locality: str, active_since: str, image_url: str):
+def add_dealer(db: Session, dealer_name: str, inventory_name: str, location: str, active_since: str, image_url: str):
     existing_dealer = db.query(Dealer).filter_by(inventory_name=inventory_name).first()
     
     if existing_dealer:
@@ -38,7 +38,7 @@ def add_dealer(db: Session, dealer_name: str, inventory_name: str, locality: str
     new_dealer = Dealer(
         name=dealer_name,
         inventory_name=inventory_name,
-        locality=locality,
+        location=location,
         active_since=active_since,
         image_url=image_url
     )

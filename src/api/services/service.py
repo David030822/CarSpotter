@@ -18,7 +18,7 @@ def insert_cars_and_dealer_by_dealer_name(db: Session, dealer_name: str):
 
     existing_dealer = db.query(Dealer).filter_by(inventory_name=dealer_data['inventory_name']).first()
 
-    dealer = add_dealer(db, dealer_data['name'], dealer_data['inventory_name'], dealer_data['locality'], dealer_data['active_since'], dealer_data['image_url'])
+    dealer = add_dealer(db, dealer_data['name'], dealer_data['inventory_name'], dealer_data['location'], dealer_data['active_since'], dealer_data['image_url'])
 
     if existing_dealer:
         existing_cars = db.query(Car).filter_by(dealer_id=dealer.id).all()
@@ -77,7 +77,7 @@ def get_cars_and_dealer_by_dealer_name(db: Session, dealer_name: str):
         "dealer": {
             "id": dealer.id,
             "name": dealer.name,
-            "location": dealer.locality,
+            "location": dealer.location,
             "active_since": dealer.active_since,
             "image_url": dealer.image_url,
         },
