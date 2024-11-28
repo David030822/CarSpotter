@@ -1,11 +1,11 @@
 class User {
-  final String firstName;
-  final String lastName;
-  final String email;
+  String firstName;
+  String lastName;
+  String email;
   // final String encodedPassword;
-  final String phoneNum;
+  String phoneNum;
   // final int activeSince;
-  final String profileImagePath;
+  String profileImagePath;
 
   User({
     required this.firstName,

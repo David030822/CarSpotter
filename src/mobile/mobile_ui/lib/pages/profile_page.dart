@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_ui/components/my_drawer.dart';
+import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/models/user.dart';
 import 'package:mobile_ui/pages/friends_page.dart';
 import 'dart:io';
@@ -18,6 +19,11 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   File? _image;   //the image is stored here
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -28,6 +34,81 @@ class _ProfilePageState extends State<ProfilePage> {
         _image=File(pickedFile.path);  //here the image is set
       });
     }
+  }
+
+  void Function()? editProfile(User user) {
+    // set the current name, phone and email
+    _firstNameController.text = user.firstName;
+    _lastNameController.text = user.lastName;
+    _phoneController.text = user.phoneNum;
+    _emailController.text = user.email;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Column(
+          children: [
+            TextField(
+              controller: _firstNameController,
+            ),
+            TextField(
+              controller: _lastNameController,
+            ),
+            TextField(
+              controller: _phoneController,
+            ),
+            TextField(
+              controller: _emailController,
+            ),
+          ],
+        ),
+        actions: [
+          // save button
+          MaterialButton(
+            onPressed: () {
+              // get the new first name
+              String newFirstName = _firstNameController.text;
+              String newLastName = _lastNameController.text;
+              String newPhone = _phoneController.text;
+              String newEmail = _emailController.text;
+
+              // save to constants (replace with save to db later)
+              setState(() {
+                users[0].firstName = newFirstName;
+                users[0].lastName = newLastName;
+                users[0].email = newEmail;
+                users[0].phoneNum = newPhone;
+              });
+
+              // pop box
+              Navigator.pop(context);
+
+              // clear controllers
+              _firstNameController.clear();
+              _lastNameController.clear();
+              _phoneController.clear();
+              _emailController.clear();
+            },
+            child: const Text('Save'),
+          ),
+
+          // cancel button
+          MaterialButton(
+            onPressed: () {
+              // pop box
+              Navigator.pop(context);
+
+              // clear controllers
+              _firstNameController.clear();
+              _lastNameController.clear();
+              _phoneController.clear();
+              _emailController.clear();
+            },
+            child: const Text('Cancel'),
+          ),
+        ],
+      )
+    );
   }
 
   @override
@@ -81,8 +162,36 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 10),
             itemProfile('Email', widget.user.email, CupertinoIcons.mail),
             const SizedBox(height: 10),
-        
-              GestureDetector(
+
+            GestureDetector(
+              onTap: () => editProfile(widget.user),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.edit,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
+
+                    const SizedBox(width: 5),
+
+                    Text(
+                      'Edit Profile',
+                      style: GoogleFonts.dmSerifText(
+                        fontSize: 24,
+                        color: Theme.of(context).colorScheme.inversePrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
@@ -97,7 +206,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                     Text(
-                        'Go to Friends Page',
+                        'Go to Friends Page ',
                         style: GoogleFonts.dmSerifText(
                           fontSize: 24,
                           color: Theme.of(context).colorScheme.inversePrimary,
@@ -111,8 +220,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                 ),
               ),
-            ],
-          
+          ],
         ),
     );
   }
@@ -138,7 +246,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: Text(title),
                   subtitle: Text(subtitle),
                   leading: Icon(iconData),
-                  trailing: const Icon(Icons.arrow_forward,color: Colors.grey),     
+                  // trailing: const Icon(Icons.arrow_forward,color: Colors.grey),     
                 ),
               ),
             );
