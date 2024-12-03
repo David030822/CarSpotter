@@ -17,18 +17,18 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  File? _image;   //the image is stored here
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  // File? _image;   //the image is stored here
+  // Future<void> _pickImage() async {
+  //   final ImagePicker picker = ImagePicker();
+  //   final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    if(pickedFile != null)
-    {
-      setState((){
-        _image=File(pickedFile.path);  //here the image is set
-      });
-    }
-  }
+  //   if(pickedFile != null)
+  //   {
+  //     setState((){
+  //       _image=File(pickedFile.path);  //here the image is set
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) { 
@@ -55,25 +55,37 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
             const SizedBox(height: 40),
-            GestureDetector(
-              onTap: _pickImage, // to select the image
-            
-              child : CircleAvatar(
-              radius: 80,
-              backgroundImage: _image != null ? FileImage(_image!) as ImageProvider<Object> : null,
-              child: _image == null
-                  ? ClipOval(
-                      child: Image.asset(
-                        widget.user.profileImagePath,
-                        width: 160, // Set a width for the image
-                        height: 160, // Set a height for the image
-                        fit: BoxFit.cover, // Ensures the image fits well within the circular frame
+            //GestureDetector(
+              // onTap: _pickImage, // to select the image
+              // child : CircleAvatar(
+              // radius: 80,
+              // backgroundImage: _image != null ? FileImage(_image!) as ImageProvider<Object> : null,
+              // child: _image == null
+            Center(
+              child: ClipOval(
+                child: Container(
+                  width: 160, 
+                  height: 160, 
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    child: Image.network(
+                      widget.user.profileImagePath,
+                      width: 160, 
+                      height: 160,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.error,
+                        size: 80,
+                        color: Theme.of(context).colorScheme.inversePrimary,
                       ),
-                    )
-                  : null,
+                    ),
+                  ),
+                ),
               ),
             ),
-              
+
             const SizedBox(height: 10),
             itemProfile('Name', '${widget.user.firstName} ${widget.user.lastName}' , CupertinoIcons.person),
             const SizedBox(height: 10),

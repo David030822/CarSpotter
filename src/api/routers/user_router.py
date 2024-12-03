@@ -113,3 +113,26 @@ def get_own_cars(user_id: int, db: Session = Depends(get_db)):
         return []
 
     return own_cars
+
+
+class UserDataResponse(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    phone: str
+    profile_url: str
+
+
+@user_router.get("/user/{user_id}", response_model=UserDataResponse)
+def get_user_data(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user_data = UserDataResponse(
+        first_name=user.first_name,
+        last_name=user.last_name,
+        email=user.email,
+        phone=str(user.phone),
+        profile_url=user.profile_url
+    )
+    return user_data

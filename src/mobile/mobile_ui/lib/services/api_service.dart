@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mobile_ui/services/auth_service.dart';
 import 'package:mobile_ui/models/dealer.dart';
 import 'package:mobile_ui/models/car.dart';
+import 'package:mobile_ui/models/user.dart';
 
 class ApiService {
   static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";
@@ -19,7 +20,6 @@ class ApiService {
     }
   }
 
-
   static Future<List<Car>> getCarsByDealerId(int dealerId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/dealer_id/$dealerId/cars'),
@@ -27,7 +27,7 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      final List<dynamic> carsJson = jsonResponse['cars']; 
+      final List<dynamic> carsJson = jsonResponse['cars'];
       return carsJson.map((json) => Car.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cars: ${response.body}');
@@ -44,7 +44,6 @@ class ApiService {
     String dealerInventoryName = "",
     String profileUrl =
         "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-    
   }) async {
     final url = Uri.parse('$baseUrl/register');
 
@@ -99,8 +98,8 @@ class ApiService {
     final String url = "$baseUrl/user/$userId/favorite/$dealerId";
 
     final response = !isFavorited
-        ? await http.delete(Uri.parse(url)) // Assuming DELETE removes favorite
-        : await http.post(Uri.parse(url)); // POST adds to favorites
+        ? await http.delete(Uri.parse(url))
+        : await http.post(Uri.parse(url));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to update favorite status');
@@ -110,11 +109,12 @@ class ApiService {
   // Get favorite dealers for a user by their userId
   static Future<List<Dealer>> getFavoriteDealers(int userId) async {
     final url = Uri.parse('$baseUrl/user/$userId/favorites');
-    final response = await http.get(url, headers: {"Authorization": "Bearer your_token_here"});
+    final response = await http
+        .get(url, headers: {"Authorization": "Bearer your_token_here"});
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      final List<dynamic> dealersJson = jsonResponse['favorites']; 
+      final List<dynamic> dealersJson = jsonResponse['favorites'];
       return dealersJson.map((json) => Dealer.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load favorite dealers');
@@ -129,6 +129,17 @@ class ApiService {
       return carList.map((json) => Car.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cars: ${response.body}');
+    }
+  }
+
+  static Future<User> getUserData(int userId) async {
+    final response = await http.get(Uri.parse('$baseUrl/user/$userId'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> user_data = jsonDecode(response.body);
+      return User.fromJson(user_data);
+    } else {
+      throw Exception('Failed to load user data: ${response.body}');
     }
   }
 }

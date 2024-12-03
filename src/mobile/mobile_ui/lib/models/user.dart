@@ -15,4 +15,25 @@ class User {
     required this.phoneNum,
     required this.profileImagePath,
   });
+
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      firstName: json['first_name'],
+      lastName: json['last_name'],
+      email: json['email'],
+      phoneNum: json['phone'],
+      profileImagePath: json['profile_url']
+    );
+  }
+
+   Map<String, dynamic> toJson() {
+    return {
+      'first_name': firstName,
+      'last_name': lastName,
+      'email': email,
+      'phone': phoneNum,
+      'profile_url': profileImagePath
+    };
+  }
 }

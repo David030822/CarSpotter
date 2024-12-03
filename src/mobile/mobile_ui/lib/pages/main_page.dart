@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_ui/components/car_tile.dart';
 import 'package:mobile_ui/components/my_drawer.dart';
-import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/pages/car_details_page.dart';
 import 'package:mobile_ui/pages/statistics_page.dart';
 import 'package:mobile_ui/services/api_service.dart';
 import 'package:mobile_ui/services/auth_service.dart';
+import 'package:mobile_ui/pages/chatbot_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -60,16 +60,35 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         drawer: MyDrawer(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => StatisticsPage()),
-            );
-          },
-          elevation: 0,
-          backgroundColor: Theme.of(context).colorScheme.tertiary,
-          child: const Icon(Icons.add),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Statistics Button
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => StatisticsPage()), //ezt ki kell cserelni
+              );
+            },
+            elevation: 0,
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
+            child: const Icon(Icons.add),
+          ),
+          SizedBox(width: 16), 
+          // Chatbot Button
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ChatbotPage()),
+              );
+            },
+            elevation: 0,
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            child: const Icon(Icons.chat),
+          ),
+        ],
         ),
         body: Center(
           child: Column(

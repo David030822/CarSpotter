@@ -1,17 +1,53 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'package:flutter/material.dart';
 import 'package:mobile_ui/components/drawer_tile.dart';
 import 'package:mobile_ui/constants.dart';
+import 'package:mobile_ui/models/user.dart';
 import 'package:mobile_ui/pages/about_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/login_page.dart';
 import 'package:mobile_ui/pages/profile_page.dart';
 import 'package:mobile_ui/pages/settings_page.dart';
 import 'package:mobile_ui/pages/statistics_page.dart';
+import 'package:mobile_ui/services/api_service.dart';
+import 'package:mobile_ui/services/auth_service.dart';
 
-class MyDrawer extends StatelessWidget {
+class MyDrawer extends StatefulWidget {
   const MyDrawer({super.key});
+
+  @override
+  State<MyDrawer> createState() => _MyDrawerState();
+}
+
+class _MyDrawerState extends State<MyDrawer> {
+  User? _user;
+
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  void loadUserData() async {
+    try {
+      final token = await AuthService.getToken();
+      if (token == null) {
+        throw Exception("User is not logged in");
+      }
+      final userId = await AuthService.getUserIdFromToken(token);
+      if (userId == null) {
+        throw Exception("Invalid user ID");
+      }
+      final user = await ApiService.getUserData(userId);
+
+      // Update state with the fetched user
+      setState(() {
+        _user = user;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,37 +64,40 @@ class MyDrawer extends StatelessWidget {
                 DrawerHeader(
                   child: Icon(Icons.directions_car),
                 ),
-        
+
                 // home tile
                 DrawerTile(
-                  title: 'H O M E',
-                  leading: const Icon(Icons.home),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomePage()
-                      ),
-                    );
-                  } 
-                ),
+                    title: 'H O M E',
+                    leading: const Icon(Icons.home),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                      );
+                    }),
 
                 // profile tile
                 DrawerTile(
                   title: 'P R O F I L E',
                   leading: const Icon(Icons.person),
                   onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProfilePage(user: users[0]),
-                      ),
-                    );
-                  }, 
+                    if (_user != null) {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePage(user: _user!),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("User data is not loaded yet")),
+                      );
+                    }
+                  },
                 ),
-                  DrawerTile(
+                DrawerTile(
                   title: 'S T A T I S T I S T I C S',
                   leading: const Icon(Icons.show_chart),
                   onTap: () {
@@ -71,8 +110,7 @@ class MyDrawer extends StatelessWidget {
                     );
                   },
                 ),
-        
-        
+
                 // settings tile
                 DrawerTile(
                   title: 'S E T T I N G S',
@@ -81,27 +119,22 @@ class MyDrawer extends StatelessWidget {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => SettingsPage()
-                      ),
+                      MaterialPageRoute(builder: (context) => SettingsPage()),
                     );
                   },
                 ),
 
                 // about tile
                 DrawerTile(
-                  title: 'A B O U T',
-                  leading: const Icon(Icons.info),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AboutPage()
-                      ),
-                    );
-                  } 
-                ),
+                    title: 'A B O U T',
+                    leading: const Icon(Icons.info),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AboutPage()),
+                      );
+                    }),
               ],
             ),
 
@@ -113,9 +146,7 @@ class MyDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginPage()
-                  ),
+                  MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               },
             ),
