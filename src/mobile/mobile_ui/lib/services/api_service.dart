@@ -4,8 +4,11 @@ import 'package:mobile_ui/services/auth_service.dart';
 import 'package:mobile_ui/models/dealer.dart';
 import 'package:mobile_ui/models/car.dart';
 
+// ngrok http http://localhost:8000
+// uvicorn api.main:app --host 0.0.0.0 --port 8000
+
 class ApiService {
-  static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";
+  static const String baseUrl = "https://ccec-212-93-150-41.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(

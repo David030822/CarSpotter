@@ -72,7 +72,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
                         return Center(
                           child: Text(
                             'Failed to load cars for ${dealer.name}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
                             ),
@@ -89,7 +89,6 @@ class _FavouritesPageState extends State<FavouritesPage> {
                                 builder: (context) => DealerCarsPage(
                                   cars: cars,
                                   name: dealer.name,
-                                  parentRoute: '/favourites',
                                 ),
                               ),
                             );

@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:mobile_ui/models/car.dart';
+import 'package:mobile_ui/models/own_car.dart';
 
-class CarTile extends StatelessWidget {
-  final Car car;
+class OwnCarTile extends StatelessWidget {
+  OwnCar ownCar;
+  final void Function(BuildContext)? editCar;
+  final void Function(BuildContext)? deleteCar;
   final void Function() onTap;
   final void Function()? onButtonTap;
 
-  const CarTile({
+  OwnCarTile({
     super.key,
-    required this.car,
+    required this.ownCar,
+    required this.editCar,
+    required this.deleteCar,
     required this.onTap,
     required this.onButtonTap,
   });
@@ -18,7 +22,28 @@ class CarTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: Slidable(
+        endActionPane: ActionPane(
+          motion: const StretchMotion(),
+          children: [
+            // Edit option
+            SlidableAction(
+              onPressed: editCar,
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              icon: Icons.edit,
+              borderRadius: BorderRadius.circular(8),
+            ),
+
+            // Delete option
+            SlidableAction(
+              onPressed: deleteCar,
+              backgroundColor: Colors.red,
+              icon: Icons.delete,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ],
+        ),
+        child: Container(
           margin: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.secondary,
@@ -37,7 +62,7 @@ class CarTile extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
-                        car.imagePath, // URL for the image
+                        ownCar.imagePath, // URL for the image
                         height: 100,
                         width: 150,
                         fit: BoxFit.cover,
@@ -54,7 +79,7 @@ class CarTile extends StatelessWidget {
                       child: Column(
                         children: [
                           Text(
-                            car.name,
+                            ownCar.name,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.inversePrimary,
                               fontWeight: FontWeight.bold,
@@ -80,19 +105,19 @@ class CarTile extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          car.fuelType,
+                          ownCar.fuelType,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                         ),
                         Text(
-                          "${car.kilometers.toString()} Km",
+                          "${ownCar.kilometers.toString()} Km",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                         ),
                         Text(
-                          "Manufactured in ${car.year}",
+                          "Manufactured in ${ownCar.year}",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.inversePrimary,
                           ),
@@ -101,7 +126,7 @@ class CarTile extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 5.0),
                           child: Text(
-                            "${car.price.toString()} €",
+                            "${ownCar.price.toString()} €",
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.inversePrimary,
                               fontSize: 16,
@@ -136,6 +161,7 @@ class CarTile extends StatelessWidget {
             ],
           ),
         ),
+      ),
     );
   }
 }

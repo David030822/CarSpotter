@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_ui/components/car_tile.dart';
+import 'package:mobile_ui/components/custom_button.dart';
 import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/pages/car_details_page.dart';
+import 'package:mobile_ui/pages/statistics_page.dart';
 
 class DealerCarsPage extends StatefulWidget {
   final List<Car> cars;
   final String name;
-  final String parentRoute;
 
   const DealerCarsPage({
     super.key,
     required this.cars,
     required this.name,
-    required this.parentRoute
   });
 
   @override
@@ -21,8 +21,6 @@ class DealerCarsPage extends StatefulWidget {
 }
 
 class _DealerCarsPageState extends State<DealerCarsPage> {
-  void editCarBox(Car car) {}
-  void deleteCarBox(Car car) {}
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +34,7 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
               children: [
@@ -65,10 +63,7 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
                     ),
                   ) : CarTile(
                       car: widget.cars[index],
-                      editCar: (context) => editCarBox(widget.cars[index]),
-                      deleteCar: (context) => deleteCarBox(widget.cars[index]),
                       onTap: () {
-                        // Navigator.pop(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -82,6 +77,25 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
                     );
                   },
                 ),
+            ),
+
+            const SizedBox(height: 15),
+
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: CustomButton(
+                color: Colors.black,
+                textColor: Colors.white,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StatisticsPage(),
+                    ),
+                  );
+                },
+                label: 'See stats for ${widget.name}',
+              ),
             ),
           ],
         ),

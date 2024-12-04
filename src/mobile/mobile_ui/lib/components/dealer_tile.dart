@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marquee/marquee.dart';
 import 'package:mobile_ui/models/dealer.dart';
 import 'package:mobile_ui/services/auth_service.dart';
 import 'package:mobile_ui/services/api_service.dart';
@@ -70,17 +71,19 @@ class _DealerTileState extends State<DealerTile> {
 
                 // name
                 Padding(
-                  padding: const EdgeInsets.only(right: 65.0),
+                  padding: const EdgeInsets.only(right: 15.0),
                   child: Column(
                     children: [
                       Text(
-                        widget.dealer.name,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.inversePrimary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          widget.dealer.name,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
                     ],
                   ),
                 ),
