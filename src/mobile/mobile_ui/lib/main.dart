@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:mobile_ui/databases/event_database.dart';
+import 'package:mobile_ui/pages/chatbot_page.dart';
 import 'package:mobile_ui/pages/favourites_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/login_page.dart';
@@ -14,11 +16,8 @@ import 'package:mobile_ui/responsive/tablet_scaffold.dart';
 import 'package:mobile_ui/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:mobile_ui/pages/chatbot_page.dart';
 
-
-void main() async{
+Future main() async{
   WidgetsFlutterBinding.ensureInitialized(); //initializing the FireBase before the app starts
   // FlutterNativeSplash.removeAfter(initialization);
   try{
@@ -26,12 +25,19 @@ void main() async{
   }catch (e) {
     print("Firebase initialization failed: $e");
   }
+
+  // initialize databases
+  await EventDatabase.initialize();
+  await EventDatabase().saveFirstLaunchDate();
  
   runApp(
     MultiProvider(
       providers: [
         // Theme Provider
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
+
+        // Event provider
+        ChangeNotifierProvider(create: (context) => EventDatabase()),
       ],
       child: const MyApp(),
     ),

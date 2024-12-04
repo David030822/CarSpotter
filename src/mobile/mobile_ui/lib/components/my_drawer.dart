@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_ui/components/drawer_tile.dart';
-import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/models/user.dart';
 import 'package:mobile_ui/pages/about_page.dart';
+import 'package:mobile_ui/pages/event_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/login_page.dart';
 import 'package:mobile_ui/pages/profile_page.dart';
@@ -61,7 +61,7 @@ class _MyDrawerState extends State<MyDrawer> {
             Column(
               children: [
                 // header
-                DrawerHeader(
+                const DrawerHeader(
                   child: Icon(Icons.directions_car),
                 ),
 
@@ -109,6 +109,22 @@ class _MyDrawerState extends State<MyDrawer> {
                       ),
                     );
                   },
+                ),
+
+                // events tile - heatmap for sold and bought cars
+                DrawerTile(
+                  title: 'E V E N T S',
+                  leading: const Icon(Icons.calendar_month),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EventsPage(),
+                      ),
+                    );
+                  },
+                  
                 ),
 
                 // settings tile
