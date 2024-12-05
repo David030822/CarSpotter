@@ -85,53 +85,87 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _editProfile() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _firstNameController,
-              decoration: const InputDecoration(labelText: 'First Name'),
-            ),
-            TextField(
-              controller: _lastNameController,
-              decoration: const InputDecoration(labelText: 'Last Name'),
-            ),
-            TextField(
-              controller: _phoneController,
-              decoration: const InputDecoration(labelText: 'Phone Number'),
-            ),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-          ],
-        ),
-        actions: [
-          MaterialButton(
-            onPressed: () {
-              setState(() {
-                _user!.firstName = _firstNameController.text;
-                _user!.lastName = _lastNameController.text;
-                _user!.phoneNum = _phoneController.text;
-                _user!.email = _emailController.text;
-              });
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _firstNameController,
+            decoration: const InputDecoration(labelText: 'First Name'),
           ),
-          MaterialButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Cancel'),
+          TextField(
+            controller: _lastNameController,
+            decoration: const InputDecoration(labelText: 'Last Name'),
+          ),
+          TextField(
+            controller: _phoneController,
+            decoration: const InputDecoration(labelText: 'Phone Number'),
+          ),
+          TextField(
+            controller: _emailController,
+            decoration: const InputDecoration(labelText: 'Email'),
           ),
         ],
       ),
-    );
-  }
+      actions: [
+        MaterialButton(
+          onPressed: () async {
+            try {
+              final token = await AuthService.getToken();
+              if (token == null) {
+                throw Exception("User is not logged in");
+              }
+
+              final userId = await AuthService.getUserIdFromToken(token);
+              if (userId == null) {
+                throw Exception("Invalid user ID");
+              }
+
+              // Call the API service to update the user data
+              final result = await ApiService.updateUserData(
+                userId,
+                _firstNameController.text,
+                _lastNameController.text,
+                _phoneController.text,
+                _emailController.text,
+              );
+
+              if (result) {
+                setState(() {
+                  _user!.firstName = _firstNameController.text;
+                  _user!.lastName = _lastNameController.text;
+                  _user!.phoneNum = _phoneController.text;
+                  _user!.email = _emailController.text;
+                });
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Profile updated successfully')),
+                );
+              } else {
+                throw Exception("Failed to update profile");
+              }
+            } catch (e) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error: ${e.toString()}')),
+              );
+            }
+          },
+          child: const Text('Save'),
+        ),
+        MaterialButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Cancel'),
+        ),
+      ],
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {

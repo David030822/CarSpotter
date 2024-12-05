@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db.database import get_db
 from api.services.user_service import (
@@ -8,8 +7,10 @@ from api.services.user_service import (
     remove_favourite_service,
     get_own_cars_service,
     get_user_data_service,
+    update_user_data_service
 )
 from api.models.response_models import CarResponse, UserDataResponse, List
+from api.models.request_models import UserUpdate
 
 user_router = APIRouter()
 
@@ -34,4 +35,12 @@ def get_user_data(user_id: int, db: Session = Depends(get_db)):
     user = get_user_data_service(user_id, db)  
 
     return UserDataResponse.from_user(user)
+
+
+@user_router.put("/user/{user_id}", response_model=UserUpdate)
+def update_user_data(user_id: int, user_data: UserUpdate, db: Session = Depends(get_db)):
+    updated_user = update_user_data_service(user_id, user_data, db)
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return updated_user
 

@@ -165,4 +165,39 @@ static Future<Map<String, dynamic>> registerUser({
       throw Exception('Failed to load user data: ${response.body}');
     }
   }
+
+  static Future<bool> updateUserData(
+    int userId,
+    String firstName,
+    String lastName,
+    String phone,
+    String email,
+  ) async {
+    try {
+      final url = Uri.parse('$baseUrl/user/$userId');
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'first_name': firstName, 
+          'last_name': lastName,    
+          'phone': phone,
+          'email': email,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Successfully updated
+      } else {
+        return false; // Failed to update
+      }
+    } catch (e) {
+      print("Error updating user: $e");
+      return false;
+    }
+  }
+
 }

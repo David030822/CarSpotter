@@ -1,7 +1,14 @@
 from pydantic import BaseModel, EmailStr
-from fastapi import File, UploadFile, Form
-from typing import Optional, Annotated
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+class UserUpdate(BaseModel):
+    first_name: str
+    last_name: str
+    phone: str
+    email: str
+
+    class Config:
+        orm_mode = True 
