@@ -1,5 +1,5 @@
 from db.database import get_db
-from api.services.service import insert_cars_and_dealer_by_dealer_name
+from api.services.car_service import insert_cars_and_dealer_by_dealer_name
 from api.services.statistics_service import calculate_sold_price_and_time_avereage
 
 def main():

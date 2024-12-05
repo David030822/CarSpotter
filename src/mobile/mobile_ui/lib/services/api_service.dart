@@ -54,7 +54,7 @@ class ApiService {
         "first_name": firstName,
         "last_name": lastName,
         "email": email,
-        "phone": int.tryParse(phone) ?? 0,
+        "phone": phone,
         "password": password,
         "profile_url": profileUrl,
         "dealer_inventory_name": dealerInventoryName,

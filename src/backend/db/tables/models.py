@@ -25,7 +25,7 @@ class User(Base):
     dealer_id = Column(BigInteger, ForeignKey('Dealer.id'), nullable=True)
     password = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
-    phone = Column(BigInteger, nullable=False)
+    phone = Column(String(20), nullable=False)
     profile_url = Column(String(255), nullable=False)
 
     favourites = relationship("Favourite", back_populates="user")
