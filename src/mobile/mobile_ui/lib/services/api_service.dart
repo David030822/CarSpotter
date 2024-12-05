@@ -39,18 +39,17 @@ class ApiService {
   }
 
   // Regisztrációs API hívás
-static Future<Map<String, dynamic>> registerUser({
+  static Future<Map<String, dynamic>> registerUser({
     required String firstName,
     required String lastName,
     required String email,
     required String phone,
     required String password,
-    String? dealerInventoryName, 
-    File? profileImage,  
+    String? dealerInventoryName,
+    File? profileImage,
   }) async {
-
     var uri = Uri.parse('$baseUrl/register');
-    
+
     var request = http.MultipartRequest('POST', uri)
       ..fields['first_name'] = firstName
       ..fields['last_name'] = lastName
@@ -62,19 +61,19 @@ static Future<Map<String, dynamic>> registerUser({
       request.fields['dealer_inventory_name'] = dealerInventoryName;
     }
 
- 
     if (profileImage != null) {
       // A fájl típusának kezelése (például jpeg, png stb.)
       var stream = http.ByteStream(profileImage.openRead());
       var length = await profileImage.length();
-      
+
       // Feltöltési fájl létrehozása
       var multipartFile = http.MultipartFile(
         'profile_image',
         stream,
         length,
         filename: profileImage.path.split('/').last,
-        contentType: MediaType('image', 'jpeg'),  // Ellenőrizd a megfelelő fájltípust!
+        contentType:
+            MediaType('image', 'jpeg'), // Ellenőrizd a megfelelő fájltípust!
       );
       request.files.add(multipartFile);
     }
@@ -86,7 +85,8 @@ static Future<Map<String, dynamic>> registerUser({
     if (response.statusCode == 200) {
       // Válasz JSON kódolása
       var responseData = await response.stream.bytesToString();
-      return jsonDecode(responseData);  // Feltételezzük, hogy a backend JSON választ küld
+      return jsonDecode(
+          responseData); // Feltételezzük, hogy a backend JSON választ küld
     } else {
       throw Exception("Failed to register user: ${response.statusCode}");
     }
@@ -160,7 +160,7 @@ static Future<Map<String, dynamic>> registerUser({
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> user_data = jsonDecode(response.body);
-      return User.fromJson(user_data); 
+      return User.fromJson(user_data);
     } else {
       throw Exception('Failed to load user data: ${response.body}');
     }
@@ -182,8 +182,8 @@ static Future<Map<String, dynamic>> registerUser({
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'first_name': firstName, 
-          'last_name': lastName,    
+          'first_name': firstName,
+          'last_name': lastName,
           'phone': phone,
           'email': email,
         }),
@@ -200,4 +200,30 @@ static Future<Map<String, dynamic>> registerUser({
     }
   }
 
+  static Future<void> updateProfileImage(int userId, File profileImage) async {
+    try {
+      var uri = Uri.parse('$baseUrl/user-image/$userId');
+      var request = http.MultipartRequest('PUT', uri);
+
+      // Add the image file to the request
+      var stream = http.ByteStream(profileImage.openRead());
+      var length = await profileImage.length();
+      var multipartFile = http.MultipartFile(
+        'profile_image',
+        stream,
+        length,
+        filename: profileImage.path.split('/').last,
+        contentType: MediaType('image', 'jpeg'),
+      );
+      request.files.add(multipartFile);
+
+      var response = await request.send();
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to upload image');
+      }
+    } catch (e) {
+      throw Exception('Failed to upload image');
+    }
+  }
 }

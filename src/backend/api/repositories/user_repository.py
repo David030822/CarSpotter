@@ -46,8 +46,6 @@ def get_own_cars_by_user(db: Session, user_id: int):
     return db.query(OwnCar).filter(OwnCar.user_id == user_id).all()
 
 
-
-
 def update_user_repository(existing_user: User, user_data: UserUpdate, db: Session) -> User:
     existing_user.first_name = user_data.first_name
     existing_user.last_name = user_data.last_name

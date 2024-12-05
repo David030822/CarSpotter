@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from db.database import get_db
 from api.services.user_service import (
@@ -7,10 +7,12 @@ from api.services.user_service import (
     remove_favourite_service,
     get_own_cars_service,
     get_user_data_service,
-    update_user_data_service
+    update_user_data_service,
+    update_user_image_service
 )
 from api.models.response_models import CarResponse, UserDataResponse, List
 from api.models.request_models import UserUpdate
+from api.repositories.save_file import save_file
 
 user_router = APIRouter()
 
@@ -44,3 +46,19 @@ def update_user_data(user_id: int, user_data: UserUpdate, db: Session = Depends(
         raise HTTPException(status_code=404, detail="User not found")
     return updated_user
 
+
+@user_router.put("/user-image/{user_id}")
+async def update_user_image(
+    user_id: int,
+    profile_image: UploadFile = File(None), 
+    db: Session = Depends(get_db),
+):
+    if profile_image:
+        profile_image_path = save_file(profile_image)  
+    else:
+        profile_image_path = None
+
+    updated_user = update_user_image_service(user_id, profile_image_path, db)
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return updated_user

@@ -18,7 +18,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   User? _user;
-  bool _isLoading = true; // Az adatbetöltés állapotának nyomon követése
+  bool _isLoading = true;
   File? _image;
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -70,102 +70,121 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         _image = File(pickedFile.path);
       });
+
+      _updateProfileImage(pickedFile);
     }
   }
 
-  void _viewImage() {
-    if (_image != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FullScreenImagePage(image: _image!),
-        ),
+  Future<void> _updateProfileImage(XFile pickedFile) async {
+    try {
+      final token = await AuthService.getToken();
+      if (token == null) {
+        throw Exception("User is not logged in");
+      }
+
+      final userId = await AuthService.getUserIdFromToken(token);
+      if (userId == null) {
+        throw Exception("Invalid user ID");
+      }
+
+  
+      await ApiService.updateProfileImage(userId, File(pickedFile.path)); 
+
+      setState(() {
+        _user!.profileImage = pickedFile.path;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Profile image updated successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
       );
     }
   }
 
   void _editProfile() {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _firstNameController,
-            decoration: const InputDecoration(labelText: 'First Name'),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _firstNameController,
+              decoration: const InputDecoration(labelText: 'First Name'),
+            ),
+            TextField(
+              controller: _lastNameController,
+              decoration: const InputDecoration(labelText: 'Last Name'),
+            ),
+            TextField(
+              controller: _phoneController,
+              decoration: const InputDecoration(labelText: 'Phone Number'),
+            ),
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+            ),
+          ],
+        ),
+        actions: [
+          MaterialButton(
+            onPressed: () async {
+              try {
+                final token = await AuthService.getToken();
+                if (token == null) {
+                  throw Exception("User is not logged in");
+                }
+
+                final userId = await AuthService.getUserIdFromToken(token);
+                if (userId == null) {
+                  throw Exception("Invalid user ID");
+                }
+
+                // Call the API service to update the user data
+                final result = await ApiService.updateUserData(
+                  userId,
+                  _firstNameController.text,
+                  _lastNameController.text,
+                  _phoneController.text,
+                  _emailController.text,
+                );
+
+                if (result) {
+                  setState(() {
+                    _user!.firstName = _firstNameController.text;
+                    _user!.lastName = _lastNameController.text;
+                    _user!.phoneNum = _phoneController.text;
+                    _user!.email = _emailController.text;
+                  });
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Profile updated successfully')),
+                  );
+                } else {
+                  throw Exception("Failed to update profile");
+                }
+              } catch (e) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error: ${e.toString()}')),
+                );
+              }
+            },
+            child: const Text('Save'),
           ),
-          TextField(
-            controller: _lastNameController,
-            decoration: const InputDecoration(labelText: 'Last Name'),
-          ),
-          TextField(
-            controller: _phoneController,
-            decoration: const InputDecoration(labelText: 'Phone Number'),
-          ),
-          TextField(
-            controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email'),
+          MaterialButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
           ),
         ],
       ),
-      actions: [
-        MaterialButton(
-          onPressed: () async {
-            try {
-              final token = await AuthService.getToken();
-              if (token == null) {
-                throw Exception("User is not logged in");
-              }
-
-              final userId = await AuthService.getUserIdFromToken(token);
-              if (userId == null) {
-                throw Exception("Invalid user ID");
-              }
-
-              // Call the API service to update the user data
-              final result = await ApiService.updateUserData(
-                userId,
-                _firstNameController.text,
-                _lastNameController.text,
-                _phoneController.text,
-                _emailController.text,
-              );
-
-              if (result) {
-                setState(() {
-                  _user!.firstName = _firstNameController.text;
-                  _user!.lastName = _lastNameController.text;
-                  _user!.phoneNum = _phoneController.text;
-                  _user!.email = _emailController.text;
-                });
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Profile updated successfully')),
-                );
-              } else {
-                throw Exception("Failed to update profile");
-              }
-            } catch (e) {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error: ${e.toString()}')),
-              );
-            }
-          },
-          child: const Text('Save'),
-        ),
-        MaterialButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Cancel'),
-        ),
-      ],
-    ),
-  );
-}
-
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -196,29 +215,29 @@ class _ProfilePageState extends State<ProfilePage> {
                 GestureDetector(
                   onTap: _pickImage,
                   child: CircleAvatar(
-                    radius: 80, 
-                    backgroundColor: Colors.grey[300], 
+                    radius: 80,
+                    backgroundColor: Colors.grey[300],
                     child: _image != null
-                        ? ClipOval(  
+                        ? ClipOval(
                             child: Image.file(
                               _image!,
-                              width: 160,  
-                              height: 160,  
-                              fit: BoxFit.cover,  
+                              width: 160,
+                              height: 160,
+                              fit: BoxFit.cover,
                             ),
                           )
                         : (_user!.profileImage != null
                             ? ClipOval(
                                 child: _user!.getDecodedProfileImage() != null
                                     ? Image.memory(
-                                        _user!.getDecodedProfileImage()!, 
+                                        _user!.getDecodedProfileImage()!,
                                         width: 160,
                                         height: 160,
                                         fit: BoxFit.cover,
                                       )
-                                    : const Icon(Icons.person, size: 80), 
+                                    : const Icon(Icons.person, size: 80),
                               )
-                            : const Icon(Icons.person, size: 80)), 
+                            : const Icon(Icons.person, size: 80)),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -301,25 +320,3 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-class FullScreenImagePage extends StatelessWidget {
-  final File image;
-  const FullScreenImagePage({super.key, required this.image});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
-      body: Center(
-        child: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Image.file(
-            image,
-            fit: BoxFit.cover,
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-          ),
-        ),
-      ),
-    );
-  }
-}

@@ -1,7 +1,9 @@
+import os
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from api.models.request_models import UserUpdate
 from api.repositories.dealer_car_repository import get_dealer_by_id
+from pathlib import Path 
 from api.repositories.user_repository import (
     get_favourite,
     add_favourite,
@@ -77,3 +79,23 @@ def update_user_data_service(user_id: int, user_data: UserUpdate, db: Session):
     updated_user = update_user_repository(existing_user, user_data, db)
     
     return updated_user
+
+
+def update_user_image_service(user_id: int, profile_image_path: str, db: Session):
+    user = get_user_by_id(db,user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.profile_image_path:
+        old_image_path = Path(user.profile_image_path)
+        
+        if old_image_path.exists() and old_image_path.is_file():
+            try:
+                os.remove(old_image_path)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error deleting old image: {e}")
+
+    user.profile_image_path = profile_image_path
+    db.commit()
+    db.refresh(user) 
+    return user 
