@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from db.database import get_db
 from api.services.user_service import (
@@ -30,4 +31,7 @@ def get_own_cars(user_id: int, db: Session = Depends(get_db)):
 
 @user_router.get("/user/{user_id}", response_model=UserDataResponse)
 def get_user_data(user_id: int, db: Session = Depends(get_db)):
-    return get_user_data_service(user_id, db)
+    user = get_user_data_service(user_id, db)  
+
+    return UserDataResponse.from_user(user)
+

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, BigInteger, Float, Date, Boolean, ForeignKey
+from sqlalchemy import Column, String, Integer, BigInteger, Float, Date, LargeBinary, ForeignKey
 from sqlalchemy.orm import relationship
 from db.database import Base
 
@@ -26,12 +26,11 @@ class User(Base):
     password = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
     phone = Column(String(20), nullable=False)
-    profile_url = Column(String(255), nullable=False)
+    profile_image_path = Column(String(255), nullable=True)
 
     favourites = relationship("Favourite", back_populates="user")
     own_cars = relationship("OwnCar", back_populates="user")
     app_logs = relationship("AppLog", back_populates="user")
-    app_devices = relationship("AppDevice", back_populates="user")
 
 
 class Car(Base):
@@ -107,14 +106,3 @@ class Favourite(Base):
     dealer = relationship("Dealer", back_populates="favourites")
     user = relationship("User", back_populates="favourites")
 
-
-class AppDevice(Base):
-    __tablename__ = 'AppDevices'
-
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    registered = Column(Date, nullable=False)
-    used = Column(BigInteger, nullable=False)
-    lastUsage = Column(Date, nullable=False)
-    user_id = Column(BigInteger, ForeignKey('User.id'), nullable=False)
-
-    user = relationship("User", back_populates="app_devices")

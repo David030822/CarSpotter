@@ -1,4 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:path/path.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_ui/services/auth_service.dart';
 import 'package:mobile_ui/models/dealer.dart';
@@ -35,37 +39,56 @@ class ApiService {
   }
 
   // Regisztrációs API hívás
-  static Future<Map<String, dynamic>> registerUser({
+static Future<Map<String, dynamic>> registerUser({
     required String firstName,
     required String lastName,
     required String email,
     required String phone,
     required String password,
-    String dealerInventoryName = "",
-    String profileUrl =
-        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+    String? dealerInventoryName, 
+    File? profileImage,  
   }) async {
-    final url = Uri.parse('$baseUrl/register');
 
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "first_name": firstName,
-        "last_name": lastName,
-        "email": email,
-        "phone": phone,
-        "password": password,
-        "profile_url": profileUrl,
-        "dealer_inventory_name": dealerInventoryName,
-      }),
-    );
+    var uri = Uri.parse('$baseUrl/register');
+    
+    var request = http.MultipartRequest('POST', uri)
+      ..fields['first_name'] = firstName
+      ..fields['last_name'] = lastName
+      ..fields['email'] = email
+      ..fields['phone'] = phone
+      ..fields['password'] = password;
 
+    if (dealerInventoryName != null && dealerInventoryName.isNotEmpty) {
+      request.fields['dealer_inventory_name'] = dealerInventoryName;
+    }
+
+ 
+    if (profileImage != null) {
+      // A fájl típusának kezelése (például jpeg, png stb.)
+      var stream = http.ByteStream(profileImage.openRead());
+      var length = await profileImage.length();
+      
+      // Feltöltési fájl létrehozása
+      var multipartFile = http.MultipartFile(
+        'profile_image',
+        stream,
+        length,
+        filename: profileImage.path.split('/').last,
+        contentType: MediaType('image', 'jpeg'),  // Ellenőrizd a megfelelő fájltípust!
+      );
+      request.files.add(multipartFile);
+    }
+
+    // Az API hívás elküldése
+    var response = await request.send();
+
+    // Ha a válasz sikeres (200 OK)
     if (response.statusCode == 200) {
-      return Map<String, dynamic>.from(jsonDecode(response.body));
+      // Válasz JSON kódolása
+      var responseData = await response.stream.bytesToString();
+      return jsonDecode(responseData);  // Feltételezzük, hogy a backend JSON választ küld
     } else {
-      final errorResponse = jsonDecode(response.body);
-      throw Exception(errorResponse["detail"] ?? "Unknown error occurred");
+      throw Exception("Failed to register user: ${response.statusCode}");
     }
   }
 
@@ -137,7 +160,7 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> user_data = jsonDecode(response.body);
-      return User.fromJson(user_data);
+      return User.fromJson(user_data); 
     } else {
       throw Exception('Failed to load user data: ${response.body}');
     }

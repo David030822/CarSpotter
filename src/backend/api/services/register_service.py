@@ -20,24 +20,24 @@ def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 def register_user_service(request, db: Session):
-    existing_user = get_user_by_email(db, request.email)
+    existing_user = get_user_by_email(db, request["email"])
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered.")
 
     new_user_data = {
-        "first_name": request.first_name,
-        "last_name": request.last_name,
-        "email": request.email,
-        "phone": request.phone,
-        "password": hash_password(request.password),
-        "profile_url": request.profile_url
+        "first_name": request["first_name"],
+        "last_name": request["last_name"],
+        "email": request["email"],
+        "phone": request["phone"],
+        "password": hash_password(request["password"]),
+        "profile_image_path": request["profile_image_path"] 
     }
 
-    if request.dealer_inventory_name and request.dealer_inventory_name.strip():
-        dealer = get_dealer_by_inventory_name(db, request.dealer_inventory_name)
+    if request["dealer_inventory_name"] and request["dealer_inventory_name"].strip():
+        dealer = get_dealer_by_inventory_name(db, request["dealer_inventory_name"])
         if not dealer:
-            insert_cars_and_dealer_by_dealer_name(db, request.dealer_inventory_name)
-            dealer = get_dealer_by_inventory_name(db, request.dealer_inventory_name)
+            insert_cars_and_dealer_by_dealer_name(db,  request["dealer_inventory_name"])
+            dealer = get_dealer_by_inventory_name(db,  request["dealer_inventory_name"])
             if not dealer:
                 raise HTTPException(status_code=400, detail="Not a valid dealer.")
 

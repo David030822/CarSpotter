@@ -60,7 +60,6 @@ def get_own_cars_service(user_id: int, db: Session):
 
 def get_user_data_service(user_id: int, db: Session):
     user = get_user_by_id(db, user_id)
-    print(user)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     

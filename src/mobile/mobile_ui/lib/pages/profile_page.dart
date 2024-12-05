@@ -3,116 +3,138 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_ui/components/my_drawer.dart';
-import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/models/user.dart';
-import 'package:mobile_ui/pages/friends_page.dart';
+import 'package:mobile_ui/services/api_service.dart';
+import 'package:mobile_ui/services/auth_service.dart';
 import 'dart:io';
+import 'package:mobile_ui/pages/friends_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  final User user;
-  const ProfilePage({super.key, required this.user});
+  const ProfilePage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  File? _image;   //the image is stored here
+  User? _user;
+  bool _isLoading = true; // Az adatbetöltés állapotának nyomon követése
+  File? _image;
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final token = await AuthService.getToken();
+      if (token == null) {
+        throw Exception("User is not logged in");
+      }
+
+      final userId = await AuthService.getUserIdFromToken(token);
+      if (userId == null) {
+        throw Exception("Invalid user ID");
+      }
+
+      final user = await ApiService.getUserData(userId);
+
+      setState(() {
+        _user = user;
+        _firstNameController.text = user.firstName;
+        _lastNameController.text = user.lastName;
+        _phoneController.text = user.phoneNum;
+        _emailController.text = user.email;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
+
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if(pickedFile != null)
-    {
-      setState((){
-        _image=File(pickedFile.path);  //here the image is set
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
       });
     }
   }
 
-  void Function()? editProfile(User user) {
-    // set the current name, phone and email
-    _firstNameController.text = user.firstName;
-    _lastNameController.text = user.lastName;
-    _phoneController.text = user.phoneNum;
-    _emailController.text = user.email;
+  void _viewImage() {
+    if (_image != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FullScreenImagePage(image: _image!),
+        ),
+      );
+    }
+  }
 
+  void _editProfile() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: _firstNameController,
+              decoration: const InputDecoration(labelText: 'First Name'),
             ),
             TextField(
               controller: _lastNameController,
+              decoration: const InputDecoration(labelText: 'Last Name'),
             ),
             TextField(
               controller: _phoneController,
+              decoration: const InputDecoration(labelText: 'Phone Number'),
             ),
             TextField(
               controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
             ),
           ],
         ),
         actions: [
-          // save button
           MaterialButton(
             onPressed: () {
-              // get the new first name
-              String newFirstName = _firstNameController.text;
-              String newLastName = _lastNameController.text;
-              String newPhone = _phoneController.text;
-              String newEmail = _emailController.text;
-
-              // save to constants (replace with save to db later)
               setState(() {
-                users[0].firstName = newFirstName;
-                users[0].lastName = newLastName;
-                users[0].email = newEmail;
-                users[0].phoneNum = newPhone;
+                _user!.firstName = _firstNameController.text;
+                _user!.lastName = _lastNameController.text;
+                _user!.phoneNum = _phoneController.text;
+                _user!.email = _emailController.text;
               });
-
-              // pop box
               Navigator.pop(context);
-
-              // clear controllers
-              _firstNameController.clear();
-              _lastNameController.clear();
-              _phoneController.clear();
-              _emailController.clear();
             },
             child: const Text('Save'),
           ),
-
-          // cancel button
           MaterialButton(
             onPressed: () {
-              // pop box
               Navigator.pop(context);
-
-              // clear controllers
-              _firstNameController.clear();
-              _lastNameController.clear();
-              _phoneController.clear();
-              _emailController.clear();
             },
             child: const Text('Cancel'),
           ),
         ],
-      )
+      ),
     );
   }
 
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
@@ -120,135 +142,150 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.transparent,
       ),
       drawer: const MyDrawer(),
-  
-      body: ListView(
-         children:[
-          Padding(
-            padding: const EdgeInsets.only(top: 40.0),
-            child: Center (
-              child: Text(
-               'Profile page',
-                style: GoogleFonts.dmSerifText(
-                fontSize: 48,
-                color: Theme.of(context).colorScheme.inversePrimary,
-              ),
-            ),
-          ),
-        ),
-            const SizedBox(height: 40),
-            GestureDetector(
-              onTap: _pickImage, // to select the image
-            
-              child : CircleAvatar(
-              radius: 80,
-              backgroundImage: _image != null ? FileImage(_image!) as ImageProvider<Object> : null,
-              child: _image == null
-                  ? ClipOval(
-                      child: Image.asset(
-                        widget.user.profileImagePath,
-                        width: 160, // Set a width for the image
-                        height: 160, // Set a height for the image
-                        fit: BoxFit.cover, // Ensures the image fits well within the circular frame
-                      ),
-                    )
-                  : null,
-              ),
-            ),
-              
-            const SizedBox(height: 10),
-            itemProfile('Name', '${widget.user.firstName} ${widget.user.lastName}' , CupertinoIcons.person),
-            const SizedBox(height: 10),
-            itemProfile('Phone', widget.user.phoneNum, CupertinoIcons.phone),
-            const SizedBox(height: 10),
-            itemProfile('Email', widget.user.email, CupertinoIcons.mail),
-            const SizedBox(height: 10),
-
-            GestureDetector(
-              onTap: () => editProfile(widget.user),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.edit,
-                      color: Theme.of(context).colorScheme.inversePrimary,
-                    ),
-
-                    const SizedBox(width: 5),
-
-                    Text(
-                      'Edit Profile',
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : ListView(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 40.0),
+                  child: Center(
+                    child: Text(
+                      'Profile Page',
                       style: GoogleFonts.dmSerifText(
-                        fontSize: 24,
+                        fontSize: 48,
                         color: Theme.of(context).colorScheme.inversePrimary,
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const FriendsPage(),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                const SizedBox(height: 40),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 80, 
+                    backgroundColor: Colors.grey[300], 
+                    child: _image != null
+                        ? ClipOval(  
+                            child: Image.file(
+                              _image!,
+                              width: 160,  
+                              height: 160,  
+                              fit: BoxFit.cover,  
+                            ),
+                          )
+                        : (_user!.profileImage != null
+                            ? ClipOval(
+                                child: _user!.getDecodedProfileImage() != null
+                                    ? Image.memory(
+                                        _user!.getDecodedProfileImage()!, 
+                                        width: 160,
+                                        height: 160,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : const Icon(Icons.person, size: 80), 
+                              )
+                            : const Icon(Icons.person, size: 80)), 
+                  ),
+                ),
+                const SizedBox(height: 10),
+                itemProfile('Name', '${_user!.firstName} ${_user!.lastName}', CupertinoIcons.person),
+                const SizedBox(height: 10),
+                itemProfile('Phone', _user!.phoneNum, CupertinoIcons.phone),
+                const SizedBox(height: 10),
+                itemProfile('Email', _user!.email, CupertinoIcons.mail),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: _editProfile,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                    Text(
+                      Icon(Icons.edit, color: Theme.of(context).colorScheme.inversePrimary),
+                      const SizedBox(width: 5),
+                      Text(
+                        'Edit Profile',
+                        style: GoogleFonts.dmSerifText(
+                          fontSize: 24,
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 15),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const FriendsPage(),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
                         'Go to Friends Page ',
                         style: GoogleFonts.dmSerifText(
                           fontSize: 24,
                           color: Theme.of(context).colorScheme.inversePrimary,
                         ),
                       ),
-                      Icon(
-                        Icons.arrow_forward,
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                      ),
+                      Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.inversePrimary),
                     ],
-                      ),
+                  ),
                 ),
-              ),
-          ],
-        ),
+              ],
+            ),
     );
   }
-  
-    Widget itemProfile(String title, String subtitle, IconData iconData){
-       return Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary,
-                  borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        offset: const Offset(0,5),
-                        color: Colors.grey.withOpacity(.2),
-                        spreadRadius: 5,
-                        blurRadius: 10,
-                      ),
-                    ],
-                ),
-                margin: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: ListTile(
-                  title: Text(title),
-                  subtitle: Text(subtitle),
-                  leading: Icon(iconData),
-                  // trailing: const Icon(Icons.arrow_forward,color: Colors.grey),     
-                ),
-              ),
-            );
-     }
+
+  Widget itemProfile(String title, String subtitle, IconData iconData) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondary,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            offset: const Offset(0, 5),
+            color: Colors.grey.withOpacity(.2),
+            spreadRadius: 5,
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: ListTile(
+          title: Text(title),
+          subtitle: Text(subtitle),
+          leading: Icon(iconData),
+        ),
+      ),
+    );
+  }
+}
+
+class FullScreenImagePage extends StatelessWidget {
+  final File image;
+  const FullScreenImagePage({super.key, required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+      body: Center(
+        child: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Image.file(
+            image,
+            fit: BoxFit.cover,
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+          ),
+        ),
+      ),
+    );
+  }
 }
