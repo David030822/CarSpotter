@@ -1,21 +1,24 @@
 from pydantic import BaseModel
 from datetime import date
-from typing import List
+from typing import List, Optional
 import os
 import base64
 
 class CarResponse(BaseModel):
-    model: str
-    km: int
-    year: int
-    price: float
-    combustible: str
-    gearbox: str
-    body_type: str
-    cylinder_capacity: int
-    power: int
-    dateof_post: date
+    model: str 
+    km: int 
+    year: int 
+    combustible: str 
+    gearbox: str 
+    body_type: str 
+    engine_size: int 
+    power: int 
+    selling_for: float
+    bought_for: Optional[float] = None
+    sold_for: Optional[float] = None
+    spent_on: Optional[float] = None
     img_url: str
+
 
     class Config:
         orm_mode = True

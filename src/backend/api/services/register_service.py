@@ -55,13 +55,13 @@ def register_user_service(request, db: Session):
                 model=car.model,
                 km=car.km,
                 year=car.year,
-                price=car.price,
+                selling_for=car.price,
                 combustible=car.combustible,
                 gearbox=car.gearbox,
                 body_type=car.body_type,
-                cylinder_capacity=car.cylinder_capacity,
+                engine_size=car.cylinder_capacity,
                 power=car.power,
-                dateof_post=car.dateof_post,
+                purchase_date=car.dateof_post,
                 img_url=car.img_url
             )
             add_own_car(db, own_car)

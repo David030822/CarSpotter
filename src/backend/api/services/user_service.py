@@ -1,7 +1,7 @@
 import os
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from api.models.request_models import UserUpdate
+from api.models.request_models import UserUpdate, NewOwnCarRequest
 from api.repositories.dealer_car_repository import get_dealer_by_id
 from pathlib import Path 
 from api.repositories.user_repository import (
@@ -11,7 +11,8 @@ from api.repositories.user_repository import (
     get_user_by_id,
     get_own_cars_by_user,
     get_favourite_dealers_by_user,
-    update_user_repository
+    update_user_repository,
+    add_car_to_db
 )
 
 def add_favourite_service(user_id: int, dealer_id: int, db: Session):
@@ -57,8 +58,6 @@ def get_own_cars_service(user_id: int, db: Session):
     user = get_user_by_id(db, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    if not user.dealer_id:
-        raise HTTPException(status_code=400, detail="User is not a dealer")
     
     return get_own_cars_by_user(db, user_id)
 
@@ -99,3 +98,16 @@ def update_user_image_service(user_id: int, profile_image_path: str, db: Session
     db.commit()
     db.refresh(user) 
     return user 
+
+
+def add_own_car_service(user_id: int, car_data: NewOwnCarRequest, db: Session):
+    user = get_user_by_id(db, user_id= user_id)
+    if not user: 
+        raise ValueError(f"User does not exist.")
+
+    new_car = add_car_to_db(db, user_id, car_data)
+    return {
+        "message": "Car added successfully",
+        "car_id": new_car.id,
+        "model": new_car.model,
+    }

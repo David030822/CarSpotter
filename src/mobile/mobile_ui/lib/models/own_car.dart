@@ -28,4 +28,40 @@ class OwnCar {
     required this.sellPrice,
     required this.imagePath
   });
+
+  factory OwnCar.fromJson(Map<String, dynamic> json) {
+    return OwnCar(
+      name: json['model'] as String,
+      kilometers: json['km'] as int,
+      year: json['year'] as int,
+      fuelType: json['combustible'] as String,
+      gearbox: json['gearbox'] as String,
+      chassis: json['body_type'] as String,
+      engineSize: json['engine_size'] as int,
+      horsepower: json['power'] as int,
+      price: (json['selling_for'] as num).toDouble(),
+      buyPrice: (json['bought_for'] as num?)?.toDouble() ?? 0.0,
+      sellPrice: (json['sold_for'] as num?)?.toDouble() ?? 0.0,
+      spent: (json['spent_on'] as num?)?.toDouble() ?? 0.0,
+      imagePath: json['img_url'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'model': name,
+      'km': kilometers,
+      'year': year,
+      'combustible': fuelType,
+      'gearbox': gearbox,
+      'body_type': chassis,
+      'engine_size': engineSize,
+      'power': horsepower,
+      'selling_for': price,
+      'bought_for': buyPrice,
+      'sold_for': sellPrice,
+      'spent_on': spent,
+      'img_url': imagePath,
+    };
+  }
 }

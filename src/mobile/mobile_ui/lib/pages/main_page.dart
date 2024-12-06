@@ -7,6 +7,7 @@ import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/models/own_car.dart';
 import 'package:mobile_ui/pages/car_details_page.dart';
+import 'package:mobile_ui/pages/own_car_details_page.dart';
 import 'package:mobile_ui/services/api_service.dart';
 import 'package:mobile_ui/services/auth_service.dart';
 
@@ -19,7 +20,6 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   bool _isLoading = false;
-  List<Car> _myCars = [];
   List<OwnCar> _myOwnCars = [];
 
   // text editing controllers
@@ -37,8 +37,8 @@ class _MainPageState extends State<MainPage> {
   final TextEditingController _soldFor = TextEditingController();
   final TextEditingController _imagePath = TextEditingController();
 
-  void editCarBox(Car car) {}
-  void deleteCarBox(Car car) {}
+  void editCarBox(OwnCar ownCar) {}
+  void deleteCarBox(OwnCar ownCar) {}
 
   void initState() {
     super.initState();
@@ -48,7 +48,7 @@ class _MainPageState extends State<MainPage> {
   void loadOwnCars() async {
     setState(() {
       _isLoading = true;
-      _myCars = [];
+      _myOwnCars = [];
     });
 
     try {
@@ -60,7 +60,7 @@ class _MainPageState extends State<MainPage> {
       if (userId == null) {
         throw Exception("Invalid user ID");
       }
-      _myCars = await ApiService.getOwnCars(userId);
+      _myOwnCars = await ApiService.getOwnCars(userId);
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -167,7 +167,7 @@ class _MainPageState extends State<MainPage> {
         actions: [
           // save button
           MaterialButton(
-            onPressed: () {
+            onPressed: () async {
               // get the new car data
               String newCarName = _carNameController.text;
               int newCarYear = int.parse(_carYearController.text);
@@ -199,13 +199,31 @@ class _MainPageState extends State<MainPage> {
                 imagePath: imagePath
               );
 
-              // save to db
+              try {
+                final token = await AuthService.getToken();
+                if (token == null) {
+                  throw Exception("User is not authenticated");
+                }
+                final userId = await AuthService.getUserIdFromToken(token);
+                if (userId == null) {
+                  throw Exception("Invalid user ID");
+                }
 
+                // Call the API service to add the new car
+                await ApiService.addNewOwnCar(userId, newCar);
 
-              // pop box
+                // Reload cars after adding a new one
+                loadOwnCars();
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error: ${e.toString()}')),
+                );
+              }
+
+              // Pop box
               Navigator.pop(context);
 
-              // clear controllers
+              // Clear controllers
               _carNameController.clear();
               _carYearController.clear();
               _kilometersController.clear();
@@ -224,10 +242,10 @@ class _MainPageState extends State<MainPage> {
           // cancel button
           MaterialButton(
             onPressed: () {
-              // pop box
+              // Pop box
               Navigator.pop(context);
 
-              // clear controllers
+              // Clear controllers
               _carNameController.clear();
               _carYearController.clear();
               _kilometersController.clear();
@@ -246,95 +264,6 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
-
-  // // edit food box
-  // void editCarBox(Food food) {
-  //   // set the controller's text to the food's current name & calories
-  //   _foodNameController.text = food.name;
-  //   _foodCaloriesController.text = food.calories.toString();
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       content: Column(
-  //         children: [
-  //           TextField(
-  //             controller: _foodNameController,
-  //           ),
-  //           TextField(
-  //             controller: _foodCaloriesController,
-  //           ),
-  //         ],
-  //       ),
-  //       actions: [
-  //         // save button
-  //         MaterialButton(
-  //           onPressed: () {
-  //             // get the new food name
-  //             String newFoodName = _foodNameController.text;
-  //             double newFoodCalories = double.parse(_foodCaloriesController.text);
-
-  //             // save to db
-  //             context.read<FoodDatabase>().updateFood(food.id, newFoodName, newFoodCalories);
-
-  //             // pop box
-  //             Navigator.pop(context);
-
-  //             // clear controllers
-  //             _foodNameController.clear();
-  //             _foodCaloriesController.clear();
-  //           },
-  //           child: const Text('Save'),
-  //         ),
-
-  //         // cancel button
-  //         MaterialButton(
-  //           onPressed: () {
-  //             // pop box
-  //             Navigator.pop(context);
-
-  //             // clear controllers
-  //             _foodNameController.clear();
-  //             _foodCaloriesController.clear();
-  //           },
-  //           child: const Text('Cancel'),
-  //         ),
-  //       ],
-  //     )
-  //   );
-  // }
-
-  // // delete food box
-  // void deleteCarBox(Food food) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: const Text('Are you sure you want to delete?'),
-  //       actions: [
-  //         // delete button
-  //         MaterialButton(
-  //           onPressed: () {
-  //             // delete from db
-  //             context.read<FoodDatabase>().deleteFood(food.id);
-
-  //             // pop box
-  //             Navigator.pop(context);
-  //           },
-  //           child: const Text('Delete'),
-  //         ),
-
-  //         // cancel button
-  //         MaterialButton(
-  //           onPressed: () {
-  //             // pop box
-  //             Navigator.pop(context);
-  //           },
-  //           child: const Text('Cancel'),
-  //         ),
-  //       ],
-  //     )
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -360,25 +289,31 @@ class _MainPageState extends State<MainPage> {
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 80.0),
                   child: ListView.builder(
-                    itemCount: _myCars.length,
+                    itemCount: _myOwnCars.length,
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
                     itemBuilder: (context, index) {
-                      
-                      Car car = _myCars[index];
-                      // OwnCar ownCar = _myOwnCars[index];
+                      OwnCar ownCar = _myOwnCars[index];
 
-                      return CarTile(
-                        car: car,
+                      return OwnCarTile(
+                        ownCar: ownCar,
+                        editCar: (context) {
+                          editCarBox(ownCar);
+                        },
+                        deleteCar: (context) {
+                          deleteCarBox(ownCar);
+                        },
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => CarDetailsPage(car: car),
+                              builder: (context) => OwnCarDetailsPage(ownCar: ownCar),
                             ),
                           );
                         },
-                        onButtonTap: () {},
+                        onButtonTap: () {
+                          // Additional button tap action if needed
+                        },
                       );
                     },
                   ),

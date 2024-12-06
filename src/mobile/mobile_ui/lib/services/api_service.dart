@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:mobile_ui/models/own_car.dart';
 import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
@@ -13,7 +14,7 @@ import 'package:mobile_ui/models/user.dart';
 // uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 class ApiService {
-  static const String baseUrl = "https://ccec-212-93-150-41.ngrok-free.app";
+  static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
@@ -147,12 +148,12 @@ class ApiService {
     }
   }
 
-  static Future<List<Car>> getOwnCars(int userId) async {
+  static Future<List<OwnCar>> getOwnCars(int userId) async {
     final response = await http.get(Uri.parse('$baseUrl/user/$userId/owncars'));
 
     if (response.statusCode == 200) {
       final List<dynamic> carList = jsonDecode(response.body);
-      return carList.map((json) => Car.fromJson(json)).toList();
+      return carList.map((json) => OwnCar.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cars: ${response.body}');
     }
@@ -227,6 +228,44 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Failed to upload image');
+    }
+  }
+
+static Future<void> addNewOwnCar(int userId, OwnCar newCar) async {
+    final url = Uri.parse('$baseUrl/user/$userId/newcar');
+    final token = await AuthService.getToken();
+
+    if (token == null) {
+      throw Exception("User is not authenticated");
+    }
+
+    final newCarRequest = {
+      'model': newCar.name,
+      'km': newCar.kilometers,
+      'year': newCar.year,
+      'combustible': newCar.fuelType,
+      'gearbox': newCar.gearbox,
+      'body_type': newCar.chassis,
+      'engine_size': newCar.engineSize,
+      'power': newCar.horsepower,
+      'selling_for': newCar.price,
+      'bought_for': newCar.buyPrice,
+      'sold_for': newCar.sellPrice,
+      'spent_on': newCar.spent,
+      'img_url': newCar.imagePath,
+    };
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(newCarRequest),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to add car: ${response.body}');
     }
   }
 }

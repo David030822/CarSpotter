@@ -8,10 +8,11 @@ from api.services.user_service import (
     get_own_cars_service,
     get_user_data_service,
     update_user_data_service,
-    update_user_image_service
+    update_user_image_service,
+    add_own_car_service
 )
 from api.models.response_models import CarResponse, UserDataResponse, List
-from api.models.request_models import UserUpdate
+from api.models.request_models import UserUpdate, NewOwnCarRequest
 from api.repositories.save_file import save_file
 
 user_router = APIRouter()
@@ -35,7 +36,6 @@ def get_own_cars(user_id: int, db: Session = Depends(get_db)):
 @user_router.get("/user/{user_id}", response_model=UserDataResponse)
 def get_user_data(user_id: int, db: Session = Depends(get_db)):
     user = get_user_data_service(user_id, db)  
-
     return UserDataResponse.from_user(user)
 
 
@@ -62,3 +62,8 @@ async def update_user_image(
     if not updated_user:
         raise HTTPException(status_code=404, detail="User not found")
     return updated_user
+
+
+@user_router.post("/user/{user_id}/newcar")
+def add_new_own_car(user_id: int, own_car: NewOwnCarRequest, db: Session = Depends(get_db)):
+    return add_own_car_service(user_id, own_car, db)

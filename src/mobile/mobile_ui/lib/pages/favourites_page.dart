@@ -39,7 +39,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to load favorites: $e")));
+          const SnackBar(content: Text("Dont have any favourite dealer yet")));
     }
   }
 

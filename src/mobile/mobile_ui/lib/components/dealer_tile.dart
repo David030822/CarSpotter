@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:marquee/marquee.dart';
 import 'package:mobile_ui/models/dealer.dart';
 import 'package:mobile_ui/services/auth_service.dart';
 import 'package:mobile_ui/services/api_service.dart';

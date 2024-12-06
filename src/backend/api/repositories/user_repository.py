@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from db.tables.models import User,Favourite, OwnCar, Dealer
-from api.models.request_models import UserUpdate
+from api.models.request_models import UserUpdate,NewOwnCarRequest
+from datetime import datetime
 
 def get_user_by_id(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
@@ -55,3 +56,28 @@ def update_user_repository(existing_user: User, user_data: UserUpdate, db: Sessi
     db.commit()
     db.refresh(existing_user)
     return existing_user
+
+
+def add_car_to_db(db: Session, user_id: int, car_data: NewOwnCarRequest) -> OwnCar:
+    new_car = OwnCar(
+        model=car_data.model,
+        km=car_data.km,
+        year=car_data.year,
+        combustible=car_data.combustible,
+        gearbox=car_data.gearbox,
+        body_type=car_data.body_type,
+        engine_size=car_data.engine_size,
+        power=car_data.power,
+        selling_for=car_data.selling_for,
+        bought_for=car_data.bought_for,
+        spent_on=car_data.spent_on,
+        sold_for=car_data.sold_for,
+        purchase_date=datetime.now().date(),
+        img_url=car_data.img_url,
+        user_id=user_id
+    )
+    db.add(new_car)
+    db.commit()
+    db.refresh(new_car) 
+    return new_car
+
