@@ -92,6 +92,27 @@ def add_following(user_id: int, followed_id: int, db: Session) -> Followers:
     db.refresh(following)
     return following
 
+def get_following(user_id: int, db: Session):
+    return (
+        db.query(User)
+        .join(Followers, Followers.following_id == User.id)
+        .filter(Followers.follower_id == user_id)
+        .all()
+    )
+
+def delete_following(user_id: int, following_id: int, db: Session):
+    following = db.query(Followers).filter(
+        Followers.follower_id == user_id, 
+        Followers.following_id == following_id
+    ).first()
+
+    if not following:
+        return None 
+    db.delete(following)
+    db.commit()
+    return following  
+
+
 
 def is_followed(user_id: int, followed_id: int, db: Session) -> bool:
     result = db.query(Followers).filter(Followers.follower_id == user_id, Followers.following_id == followed_id).first()

@@ -6,8 +6,10 @@ from api.repositories.dealer_car_repository import get_dealer_by_id
 from pathlib import Path 
 from api.repositories.user_repository import (
     add_following,
+    delete_following,
     get_favourite,
     add_favourite,
+    get_following,
     is_followed,
     remove_favourite,
     get_user_by_id,
@@ -135,3 +137,17 @@ def add_following_service(user_id: int, followed_id: int, db: Session):
     return {
         "message": "User followed successfully"
     }
+
+def get_following_service(user_id: int, db: Session):
+    user = get_user_by_id(db, user_id= user_id)
+    if not user: 
+        raise ValueError(f"User does not exist.")
+
+    return get_following(user_id, db)
+
+
+def delete_following_service(user_id: int, following_id: int, db: Session):
+    user = delete_following(user_id, following_id, db)
+    if not user: 
+        raise ValueError(f"User does not exist.")
+    return {"message": "Following deleted successfully"}

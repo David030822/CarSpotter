@@ -63,4 +63,3 @@ def _get_default_image() -> str:
         print(f"Error loading default image: {e}")
         return ""
 
-

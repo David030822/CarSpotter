@@ -3,7 +3,9 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from api.services.user_service import (
     add_favourite_service,
+    delete_following_service,
     get_favourites_service,
+    get_following_service,
     remove_favourite_service,
     get_own_cars_service,
     get_user_data_service,
@@ -73,3 +75,16 @@ def add_new_own_car(user_id: int, own_car: NewOwnCarRequest, db: Session = Depen
 @user_router.post("/user/{user_id}/following/{following_id}")
 def add_following(user_id: int, following_id: int, db: Session = Depends(get_db)):
     return add_following_service(user_id, following_id, db)
+
+
+
+@user_router.get("/user/{user_id}/following", response_model=List[UserDataResponse])
+def get_following(user_id: int, db: Session = Depends(get_db)):
+    users = get_following_service(user_id, db)
+    return [UserDataResponse.from_user(user) for user in users]
+
+
+@user_router.delete("/user/{user_id}/following/{following_id}")
+def delete_following(user_id: int, following_id: int, db: Session = Depends(get_db)):
+    return delete_following_service(user_id, following_id, db)
+
