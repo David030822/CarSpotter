@@ -110,3 +110,14 @@ class Favourite(Base):
     dealer = relationship("Dealer", back_populates="favourites")
     user = relationship("User", back_populates="favourites")
 
+class Followers(Base):
+    __tablename__ = 'Followers'
+
+    id = id = Column(BigInteger, primary_key=True, autoincrement=True)
+    follower_id = Column(BigInteger, ForeignKey('User.id'), nullable=False)
+    following_id = Column(BigInteger, ForeignKey('User.id'), nullable=False)
+    date = Column(Date, nullable=False)
+
+    follower = relationship('User', foreign_keys=[follower_id])
+    following = relationship('User', foreign_keys=[following_id])
+

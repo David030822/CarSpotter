@@ -5,8 +5,10 @@ from api.models.request_models import UserUpdate, NewOwnCarRequest
 from api.repositories.dealer_car_repository import get_dealer_by_id
 from pathlib import Path 
 from api.repositories.user_repository import (
+    add_following,
     get_favourite,
     add_favourite,
+    is_followed,
     remove_favourite,
     get_user_by_id,
     get_own_cars_by_user,
@@ -110,4 +112,26 @@ def add_own_car_service(user_id: int, car_data: NewOwnCarRequest, db: Session):
         "message": "Car added successfully",
         "car_id": new_car.id,
         "model": new_car.model,
+    }
+
+
+def add_following_service(user_id: int, followed_id: int, db: Session):
+    user = get_user_by_id(db, user_id= user_id)
+    if not user: 
+        raise ValueError(f"User does not exist.")
+    followed = get_user_by_id(db, user_id=followed_id)
+    if not followed: 
+        raise ValueError(f"Followed user does not exist")
+    
+    is_followed_user = is_followed(user_id, followed_id, db)
+    if is_followed_user:
+        return {
+            "message": "User is already followed"
+        }   
+    
+    following = add_following(user_id= user_id, followed_id= followed_id, db=db)
+    if not following:
+        raise ValueError(f"Follow error")
+    return {
+        "message": "User followed successfully"
     }

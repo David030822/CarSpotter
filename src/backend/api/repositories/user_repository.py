@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from db.tables.models import User,Favourite, OwnCar, Dealer
+from db.tables.models import Followers, User,Favourite, OwnCar, Dealer
 from api.models.request_models import UserUpdate,NewOwnCarRequest
 from datetime import datetime
 
@@ -81,3 +81,20 @@ def add_car_to_db(db: Session, user_id: int, car_data: NewOwnCarRequest) -> OwnC
     db.refresh(new_car) 
     return new_car
 
+def add_following(user_id: int, followed_id: int, db: Session) -> Followers:
+    following = Followers(
+        follower_id=user_id,
+        following_id=followed_id,
+        date=datetime.now().date()
+    )
+    db.add(following)
+    db.commit()
+    db.refresh(following)
+    return following
+
+
+def is_followed(user_id: int, followed_id: int, db: Session) -> bool:
+    result = db.query(Followers).filter(Followers.follower_id == user_id, Followers.following_id == followed_id).first()
+    if result:
+        return True
+    return False

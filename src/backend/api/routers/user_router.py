@@ -9,7 +9,8 @@ from api.services.user_service import (
     get_user_data_service,
     update_user_data_service,
     update_user_image_service,
-    add_own_car_service
+    add_own_car_service,
+    add_following_service
 )
 from api.models.response_models import CarResponse, UserDataResponse, List
 from api.models.request_models import UserUpdate, NewOwnCarRequest
@@ -67,3 +68,8 @@ async def update_user_image(
 @user_router.post("/user/{user_id}/newcar")
 def add_new_own_car(user_id: int, own_car: NewOwnCarRequest, db: Session = Depends(get_db)):
     return add_own_car_service(user_id, own_car, db)
+
+
+@user_router.post("/user/{user_id}/following/{following_id}")
+def add_following(user_id: int, following_id: int, db: Session = Depends(get_db)):
+    return add_following_service(user_id, following_id, db)
