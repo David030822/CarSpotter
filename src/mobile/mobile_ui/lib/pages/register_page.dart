@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile_ui/components/my_button.dart';
 import 'package:mobile_ui/components/my_text_field.dart';
 import 'package:mobile_ui/pages/login_page.dart';
-import 'package:mobile_ui/services/api_service.dart';
+import 'package:mobile_ui/services/api_service.dart'; 
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -20,11 +22,13 @@ class _RegisterPageState extends State<RegisterPage> {
   final confirmPasswordController = TextEditingController();
   final dealerNameController = TextEditingController();
 
+  File? selectedImage; // To store the selected image
   bool isLoading = false;
+
+  final ImagePicker _picker = ImagePicker(); // Image picker instance
 
   // Handle user registration
   Future<void> handleRegister() async {
-    // Validate passwords
     if (passwordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Passwords do not match!")),
@@ -32,7 +36,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // Validate required fields
     if (firstNameController.text.isEmpty ||
         lastNameController.text.isEmpty ||
         emailController.text.isEmpty ||
@@ -49,19 +52,18 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     try {
-      // Attempt registration via ApiService
       final result = await ApiService.registerUser(
         firstName: firstNameController.text,
         lastName: lastNameController.text,
         email: emailController.text,
         phone: phoneController.text,
         password: passwordController.text,
-        dealerInventoryName: dealerNameController.text,
+        dealerInventoryName: dealerNameController.text.isEmpty ? null : dealerNameController.text, // Optional field
+        profileImage: selectedImage, // Optional field
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Registration successful: ${result['message']}")),
+        SnackBar(content: Text("Registration successful: ${result['message']}")),
       );
 
       Navigator.pushReplacement(
@@ -75,6 +77,17 @@ class _RegisterPageState extends State<RegisterPage> {
     } finally {
       setState(() {
         isLoading = false;
+      });
+    }
+  }
+
+  // Select image from gallery or camera
+  Future<void> selectImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery); // or ImageSource.camera
+
+    if (pickedFile != null) {
+      setState(() {
+        selectedImage = File(pickedFile.path); // Save the selected image file
       });
     }
   }
@@ -157,14 +170,33 @@ class _RegisterPageState extends State<RegisterPage> {
                       const SizedBox(height: 25),
                       MyTextField(
                         controller: dealerNameController,
-                        hintText: 'Dealer inventory name if you are a dealer',
+                        hintText: 'Dealer inventory name (optional)',
                         obscureText: false,
                       ),
+
+                      const SizedBox(height: 25),
+
+                      // Image picker button
+                      ElevatedButton(
+                        onPressed: selectImage,
+                        child: Text(
+                            selectedImage != null ? 'Change Image' : 'Upload Image'),
+                      ),
+                      if (selectedImage != null) ...[
+                        const SizedBox(height: 10),
+                        Image.file(
+                          selectedImage!,
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ],
+
                       const SizedBox(height: 25),
 
                       // Register button or progress indicator
                       isLoading
-                          ? const CircularProgressIndicator() // Show progress indicator
+                          ? const CircularProgressIndicator()
                           : MyButton(
                               text: 'Register Now',
                               onTap: handleRegister,
