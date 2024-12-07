@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from api.services.service import insert_cars_and_dealer_by_dealer_name, get_cars_and_dealer_by_dealer_name, get_cars_by_dealer_id
+from api.services.car_service import insert_cars_and_dealer_by_dealer_name, get_cars_and_dealer_by_dealer_name, get_cars_by_dealer_id
 from db.database import get_db
 
 dealer_router = APIRouter()
@@ -36,5 +36,8 @@ def get_cars_by_dealer(dealer_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    
+
+
     
     

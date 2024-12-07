@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_ui/models/user.dart';
+import 'dart:io';
 
 class FriendPage extends StatefulWidget {
   final User user;
@@ -40,8 +41,8 @@ class _FriendPageState extends State<FriendPage> {
           
           CircleAvatar(
             radius: 80,
-            backgroundImage: _getImageProvider(widget.user.profileImagePath),
-            child: _getImageProvider(widget.user.profileImagePath) == null
+            backgroundImage: _getImageProvider(widget.user.profileImage),
+            child: _getImageProvider(widget.user.profileImage) == null
                 ? Icon(
                     Icons.person,
                     size: 80,
@@ -62,13 +63,25 @@ class _FriendPageState extends State<FriendPage> {
       );
     }
 
-    ImageProvider<Object>? _getImageProvider(String path) {
-      try {
-        return path.isNotEmpty ? AssetImage(path) : null;
-      } catch (e) {
-        return null;
+    ImageProvider<Object>? _getImageProvider(dynamic profileImage) {
+      if (profileImage is String) {
+        // It's an asset path
+        try {
+          return profileImage.isNotEmpty ? AssetImage(profileImage) : null;
+        } catch (e) {
+          return null; // Return null if there's an error
+        }
+      } else if (profileImage is File) {
+        // It's a file path, use FileImage
+        try {
+          return FileImage(profileImage);
+        } catch (e) {
+          return null; // Return null if there's an error
+        }
       }
+      return null; // Return null if profileImage is neither String nor File
     }
+
 
     Widget itemProfile(String title, String subtitle, IconData iconData){
        return Container(

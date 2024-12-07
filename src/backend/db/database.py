@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator 
 
-DATABASE_URL = "mysql+pymysql://root:@localhost:3306/carspotter2"
+DATABASE_URL = "mysql+pymysql://root:@localhost:3306/carspotter"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -1,9 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:mobile_ui/models/own_car.dart';
+import 'package:path/path.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_ui/services/auth_service.dart';
 import 'package:mobile_ui/models/dealer.dart';
 import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/models/user.dart';
+
+// ngrok http http://localhost:8000
+// uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 class ApiService {
   static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";
@@ -41,31 +49,50 @@ class ApiService {
     required String email,
     required String phone,
     required String password,
-    String dealerInventoryName = "",
-    String profileUrl =
-        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+    String? dealerInventoryName,
+    File? profileImage,
   }) async {
-    final url = Uri.parse('$baseUrl/register');
+    var uri = Uri.parse('$baseUrl/register');
 
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "first_name": firstName,
-        "last_name": lastName,
-        "email": email,
-        "phone": int.tryParse(phone) ?? 0,
-        "password": password,
-        "profile_url": profileUrl,
-        "dealer_inventory_name": dealerInventoryName,
-      }),
-    );
+    var request = http.MultipartRequest('POST', uri)
+      ..fields['first_name'] = firstName
+      ..fields['last_name'] = lastName
+      ..fields['email'] = email
+      ..fields['phone'] = phone
+      ..fields['password'] = password;
 
+    if (dealerInventoryName != null && dealerInventoryName.isNotEmpty) {
+      request.fields['dealer_inventory_name'] = dealerInventoryName;
+    }
+
+    if (profileImage != null) {
+      // A fájl típusának kezelése (például jpeg, png stb.)
+      var stream = http.ByteStream(profileImage.openRead());
+      var length = await profileImage.length();
+
+      // Feltöltési fájl létrehozása
+      var multipartFile = http.MultipartFile(
+        'profile_image',
+        stream,
+        length,
+        filename: profileImage.path.split('/').last,
+        contentType:
+            MediaType('image', 'jpeg'), // Ellenőrizd a megfelelő fájltípust!
+      );
+      request.files.add(multipartFile);
+    }
+
+    // Az API hívás elküldése
+    var response = await request.send();
+
+    // Ha a válasz sikeres (200 OK)
     if (response.statusCode == 200) {
-      return Map<String, dynamic>.from(jsonDecode(response.body));
+      // Válasz JSON kódolása
+      var responseData = await response.stream.bytesToString();
+      return jsonDecode(
+          responseData); // Feltételezzük, hogy a backend JSON választ küld
     } else {
-      final errorResponse = jsonDecode(response.body);
-      throw Exception(errorResponse["detail"] ?? "Unknown error occurred");
+      throw Exception("Failed to register user: ${response.statusCode}");
     }
   }
 
@@ -121,12 +148,12 @@ class ApiService {
     }
   }
 
-  static Future<List<Car>> getOwnCars(int userId) async {
+  static Future<List<OwnCar>> getOwnCars(int userId) async {
     final response = await http.get(Uri.parse('$baseUrl/user/$userId/owncars'));
 
     if (response.statusCode == 200) {
       final List<dynamic> carList = jsonDecode(response.body);
-      return carList.map((json) => Car.fromJson(json)).toList();
+      return carList.map((json) => OwnCar.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cars: ${response.body}');
     }
@@ -140,6 +167,105 @@ class ApiService {
       return User.fromJson(user_data);
     } else {
       throw Exception('Failed to load user data: ${response.body}');
+    }
+  }
+
+  static Future<bool> updateUserData(
+    int userId,
+    String firstName,
+    String lastName,
+    String phone,
+    String email,
+  ) async {
+    try {
+      final url = Uri.parse('$baseUrl/user/$userId');
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'first_name': firstName,
+          'last_name': lastName,
+          'phone': phone,
+          'email': email,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Successfully updated
+      } else {
+        return false; // Failed to update
+      }
+    } catch (e) {
+      print("Error updating user: $e");
+      return false;
+    }
+  }
+
+  static Future<void> updateProfileImage(int userId, File profileImage) async {
+    try {
+      var uri = Uri.parse('$baseUrl/user-image/$userId');
+      var request = http.MultipartRequest('PUT', uri);
+
+      // Add the image file to the request
+      var stream = http.ByteStream(profileImage.openRead());
+      var length = await profileImage.length();
+      var multipartFile = http.MultipartFile(
+        'profile_image',
+        stream,
+        length,
+        filename: profileImage.path.split('/').last,
+        contentType: MediaType('image', 'jpeg'),
+      );
+      request.files.add(multipartFile);
+
+      var response = await request.send();
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to upload image');
+      }
+    } catch (e) {
+      throw Exception('Failed to upload image');
+    }
+  }
+
+static Future<void> addNewOwnCar(int userId, OwnCar newCar) async {
+    final url = Uri.parse('$baseUrl/user/$userId/newcar');
+    final token = await AuthService.getToken();
+
+    if (token == null) {
+      throw Exception("User is not authenticated");
+    }
+
+    final newCarRequest = {
+      'model': newCar.name,
+      'km': newCar.kilometers,
+      'year': newCar.year,
+      'combustible': newCar.fuelType,
+      'gearbox': newCar.gearbox,
+      'body_type': newCar.chassis,
+      'engine_size': newCar.engineSize,
+      'power': newCar.horsepower,
+      'selling_for': newCar.price,
+      'bought_for': newCar.buyPrice,
+      'sold_for': newCar.sellPrice,
+      'spent_on': newCar.spent,
+      'img_url': newCar.imagePath,
+    };
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(newCarRequest),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to add car: ${response.body}');
     }
   }
 }
