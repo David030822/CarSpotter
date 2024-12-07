@@ -46,6 +46,34 @@ def remove_favourite(db: Session, favourite: Favourite):
 def get_own_cars_by_user(db: Session, user_id: int):
     return db.query(OwnCar).filter(OwnCar.user_id == user_id).all()
 
+def update_own_car(db: Session, user_id: int, updated_own_car: NewOwnCarRequest, own_car_id: int):
+    try:
+        own_car = get_own_car_by_id(db, own_car_id).first()
+        
+        if not own_car or own_car.user_id != user_id:
+            return {"message": "The car does not exist or does not belong to the user"}
+        
+        for key, value in updated_own_car.model_dump(exclude_unset=True).items():
+            setattr(own_car, key, value)
+        
+        db.commit()
+        db.refresh(own_car) 
+        return {"message": "Car updated successfully", "car": own_car}
+    
+    except Exception as e:
+        db.rollback()  # Rollback transaction on error
+        return {"message": f"An error occurred: {str(e)}"}
+
+def delete_own_car(db: Session, user_id: int, own_car_id: int):
+    own_car = db.query(OwnCar).filter(OwnCar.id == own_car_id, OwnCar.user_id == user_id).first()
+    if not own_car:
+        return False 
+    db.delete(own_car)
+    db.commit()
+    return True
+
+def get_own_car_by_id(db: Session, car_id):
+    return db.query(OwnCar).filter(OwnCar.id == car_id)
 
 def update_user_repository(existing_user: User, user_data: UserUpdate, db: Session) -> User:
     existing_user.first_name = user_data.first_name
