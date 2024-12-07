@@ -1,4 +1,5 @@
 class OwnCar {
+  int? id; // Optional ID field
   String name;
   String fuelType;
   int kilometers;
@@ -14,6 +15,7 @@ class OwnCar {
   String imagePath;
 
   OwnCar({
+    this.id, // Optional parameter
     required this.name,
     required this.fuelType,
     required this.kilometers,
@@ -26,11 +28,12 @@ class OwnCar {
     required this.buyPrice,
     required this.spent,
     required this.sellPrice,
-    required this.imagePath
+    required this.imagePath,
   });
 
   factory OwnCar.fromJson(Map<String, dynamic> json) {
     return OwnCar(
+      id: json['id'] as int?, // Map the ID if available
       name: json['model'] as String,
       kilometers: json['km'] as int,
       year: json['year'] as int,
@@ -49,6 +52,7 @@ class OwnCar {
 
   Map<String, dynamic> toJson() {
     return {
+      if (id != null) 'id': id, // Include ID only if it's set
       'model': name,
       'km': kilometers,
       'year': year,
