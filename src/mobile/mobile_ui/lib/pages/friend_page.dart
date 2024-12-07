@@ -25,39 +25,55 @@ class _FriendPageState extends State<FriendPage> {
       body: ListView(
          children:[
             Padding(
-              padding: const EdgeInsets.only(top: 40.0),
+              padding: const EdgeInsets.only(top: 20.0),
               child: Center (
                 child: Text(
-                'Friend page',
-                  style: GoogleFonts.dmSerifText(
-                  fontSize: 48,
-                  color: Theme.of(context).colorScheme.inversePrimary,
+                  'User profile page',
+                    style: GoogleFonts.dmSerifText(
+                    fontSize: 48,
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          const SizedBox(height: 40),
-          
-          CircleAvatar(
-            radius: 80,
-            backgroundImage: _getImageProvider(widget.user.profileImage),
-            child: _getImageProvider(widget.user.profileImage) == null
-                ? Icon(
-                    Icons.person,
-                    size: 80,
+            const SizedBox(height: 30),
+            
+            CircleAvatar(
+              radius: 80,
+              backgroundImage: _getImageProvider(widget.user.profileImage),
+              child: _getImageProvider(widget.user.profileImage) == null
+                  ? Icon(
+                      Icons.person,
+                      size: 80,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    )
+                  : null,
+            ),
+
+            const SizedBox(height: 10),
+            itemProfile('Name', '${widget.user.firstName} ${widget.user.lastName}' , CupertinoIcons.person),
+            const SizedBox(height: 10),
+            itemProfile('Phone', widget.user.phoneNum, CupertinoIcons.phone),
+            const SizedBox(height: 10),
+            itemProfile('Email', widget.user.email, CupertinoIcons.mail),
+            const SizedBox(height: 10),
+
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Center (
+                child: Text(
+                  '${widget.user.firstName}\'s favourite dealers',
+                    style: GoogleFonts.dmSerifText(
+                    fontSize: 24,
                     color: Theme.of(context).colorScheme.inversePrimary,
-                  )
-                : null,
-          ),
+                  ),
+                ),
+              ),
+            ),
 
-          const SizedBox(height: 10),
-          itemProfile('Name', '${widget.user.firstName} ${widget.user.lastName}' , CupertinoIcons.person),
-          const SizedBox(height: 10),
-          itemProfile('Phone', widget.user.phoneNum, CupertinoIcons.phone),
-          const SizedBox(height: 10),
-          itemProfile('Email', widget.user.email, CupertinoIcons.mail),
-          const SizedBox(height: 10),
+            // display this user's fav dealers using dealer tile
+            
           ],
         ),
       );
@@ -103,8 +119,7 @@ class _FriendPageState extends State<FriendPage> {
             child: ListTile(
             title: Text(title),
             subtitle: Text(subtitle),
-            leading: Icon(iconData),
-            trailing: const Icon(Icons.arrow_forward,color: Colors.grey),     
+            leading: Icon(iconData),   
           ),
         ),
       );
