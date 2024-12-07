@@ -18,42 +18,36 @@ List<User> users = [
     lastName: 'Demeter',
     email: 'demeter.david@gmail.com',
     phoneNum: '0745805425',
-    profileImagePath: 'assets/images/DavidBysCars.png'
   ),
   User(
   firstName: 'Emma',
   lastName: 'Johnson',
   email: 'emma.johnson@gmail.com',
   phoneNum: '0765481234',
-  profileImagePath: '',
   ),
   User(
     firstName: 'Liam',
     lastName: 'Smith',
     email: 'liam.smith@gmail.com',
     phoneNum: '0754123467',
-    profileImagePath: '',
   ),
   User(
     firstName: 'Sophia',
     lastName: 'Brown',
     email: 'sophia.brown@gmail.com',
     phoneNum: '0773219876',
-    profileImagePath: '',
   ),
   User(
     firstName: 'Noah',
     lastName: 'Davis',
     email: 'noah.davis@gmail.com',
     phoneNum: '0723456789',
-    profileImagePath: '',
   ),
   User(
     firstName: 'Ava',
     lastName: 'Taylor',
     email: 'ava.taylor@gmail.com',
     phoneNum: '0734567890',
-    profileImagePath: '',
   ),
 ];
 

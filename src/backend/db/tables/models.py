@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, BigInteger, Float, Date, Boolean, ForeignKey
+from sqlalchemy import Column, String, Integer, BigInteger, Float, Date, LargeBinary, ForeignKey
 from sqlalchemy.orm import relationship
 from db.database import Base
 
@@ -25,13 +25,12 @@ class User(Base):
     dealer_id = Column(BigInteger, ForeignKey('Dealer.id'), nullable=True)
     password = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
-    phone = Column(BigInteger, nullable=False)
-    profile_url = Column(String(255), nullable=False)
+    phone = Column(String(20), nullable=False)
+    profile_image_path = Column(String(255), nullable=True)
 
     favourites = relationship("Favourite", back_populates="user")
     own_cars = relationship("OwnCar", back_populates="user")
     app_logs = relationship("AppLog", back_populates="user")
-    app_devices = relationship("AppDevice", back_populates="user")
 
 
 class Car(Base):
@@ -74,13 +73,17 @@ class OwnCar(Base):
     model = Column(String(255), nullable=False)
     km = Column(BigInteger, nullable=False)
     year = Column(BigInteger, nullable=False)
-    price = Column(Float, nullable=False)
     combustible = Column(String(255), nullable=False)
     gearbox = Column(String(255), nullable=False)
     body_type = Column(String(255), nullable=False)
-    cylinder_capacity = Column(BigInteger, nullable=False)
+    engine_size = Column(BigInteger, nullable=False)
     power = Column(BigInteger, nullable=False)
-    dateof_post = Column(Date, nullable=False)
+    selling_for = Column(Float, nullable=False)
+    bought_for = Column(Float, nullable=True)
+    sold_for = Column(Float, nullable=True)
+    spent_on = Column(Float, nullable=True)
+    purchase_date = Column(Date, nullable=False)
+    sold_date = Column(Date, nullable=True)
     img_url = Column(String(500), nullable=False)
     user_id = Column(BigInteger, ForeignKey('User.id'), nullable=False)
 
@@ -107,14 +110,3 @@ class Favourite(Base):
     dealer = relationship("Dealer", back_populates="favourites")
     user = relationship("User", back_populates="favourites")
 
-
-class AppDevice(Base):
-    __tablename__ = 'AppDevices'
-
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    registered = Column(Date, nullable=False)
-    used = Column(BigInteger, nullable=False)
-    lastUsage = Column(Date, nullable=False)
-    user_id = Column(BigInteger, ForeignKey('User.id'), nullable=False)
-
-    user = relationship("User", back_populates="app_devices")

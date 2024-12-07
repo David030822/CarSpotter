@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from ..repositories.repository import add_car, add_dealer, add_sold_car
+from api.repositories.dealer_car_repository import add_car, add_dealer, add_sold_car
 from scraper.scripts import scrape_dealer_inventory 
 from db.tables.models import Car, Dealer, SoldCar
 from sqlalchemy.sql import func
@@ -40,7 +40,7 @@ def insert_cars_and_dealer_by_dealer_name(db: Session, dealer_name: str):
             continue
         if not car_data['km']:
             continue
-
+        print("before add", car_data['cylinder_capacity'])
         add_car(db, car_data)
         added_cars += 1
 

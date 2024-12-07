@@ -39,12 +39,15 @@ class CarDetailsPage extends StatelessWidget {
 
             const SizedBox(height: 15),
 
-            Text(
-              "Model: ${car.name}",
-              style: GoogleFonts.dmSerifText(
-                fontSize: 18,
-                color: Theme.of(context).colorScheme.inversePrimary,
-              )
+            Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Text(
+                "Model: ${car.name}",
+                style: GoogleFonts.dmSerifText(
+                  fontSize: 18,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                )
+              ),
             ),
 
             const SizedBox(height: 15),

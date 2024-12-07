@@ -1,0 +1,133 @@
+import os
+from fastapi import HTTPException
+from sqlalchemy.orm import Session
+from api.models.request_models import UserUpdate, NewOwnCarRequest
+from api.repositories.dealer_car_repository import get_dealer_by_id
+from pathlib import Path 
+from api.repositories.user_repository import (
+    delete_own_car,
+    get_favourite,
+    add_favourite,
+    remove_favourite,
+    get_user_by_id,
+    get_own_cars_by_user,
+    get_favourite_dealers_by_user,
+    update_own_car,
+    update_user_repository,
+    add_car_to_db
+)
+
+def add_favourite_service(user_id: int, dealer_id: int, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    dealer = get_dealer_by_id(db, dealer_id)
+    if not dealer:
+        raise HTTPException(status_code=404, detail="Dealer not found")
+    if get_favourite(db, user_id, dealer_id):
+        raise HTTPException(status_code=400, detail="Dealer is already in your favorites")
+    
+    add_favourite(db, user_id, dealer_id)
+    return {"message": "Dealer added to favorites"}
+
+def get_favourites_service(user_id: int, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    favourite_dealers = get_favourite_dealers_by_user(db, user_id)
+    if not favourite_dealers:
+        return {"message": "No favorite dealers found for this user."}
+
+    return {"favorites": favourite_dealers}
+
+def remove_favourite_service(user_id: int, dealer_id: int, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    dealer = get_dealer_by_id(db, dealer_id)
+    if not dealer:
+        raise HTTPException(status_code=404, detail="Dealer not found")
+    
+    favourite = get_favourite(db, user_id, dealer_id)
+    if not favourite:
+        raise HTTPException(status_code=400, detail="Dealer is not in your favorites")
+    
+    remove_favourite(db, favourite)
+    return {"message": "Dealer removed from favorites"}
+
+def get_own_cars_service(user_id: int, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return get_own_cars_by_user(db, user_id)
+
+def update_own_car_service(user_id: int, updated_own_car: NewOwnCarRequest, own_car_id: int, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    result = update_own_car(db=db, user_id=user_id, updated_own_car=updated_own_car, own_car_id=own_car_id)
+    
+    return result
+
+def delete_own_car_service(user_id: int, own_car_id: int, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return delete_own_car(db, user_id, own_car_id)
+
+
+
+
+def get_user_data_service(user_id: int, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return user
+
+
+def update_user_data_service(user_id: int, user_data: UserUpdate, db: Session):
+    existing_user = get_user_by_id(db,user_id)
+    
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    updated_user = update_user_repository(existing_user, user_data, db)
+    
+    return updated_user
+
+
+def update_user_image_service(user_id: int, profile_image_path: str, db: Session):
+    user = get_user_by_id(db,user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.profile_image_path:
+        old_image_path = Path(user.profile_image_path)
+        
+        if old_image_path.exists() and old_image_path.is_file():
+            try:
+                os.remove(old_image_path)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error deleting old image: {e}")
+
+    user.profile_image_path = profile_image_path
+    db.commit()
+    db.refresh(user) 
+    return user 
+
+
+def add_own_car_service(user_id: int, car_data: NewOwnCarRequest, db: Session):
+    user = get_user_by_id(db, user_id= user_id)
+    if not user: 
+        raise ValueError(f"User does not exist.")
+
+    new_car = add_car_to_db(db, user_id, car_data)
+    return {
+        "message": "Car added successfully",
+        "car_id": new_car.id,
+        "model": new_car.model,
+    }

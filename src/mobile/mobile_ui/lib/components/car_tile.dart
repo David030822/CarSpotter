@@ -4,16 +4,12 @@ import 'package:mobile_ui/models/car.dart';
 
 class CarTile extends StatelessWidget {
   final Car car;
-  final void Function(BuildContext)? editCar;
-  final void Function(BuildContext)? deleteCar;
   final void Function() onTap;
   final void Function()? onButtonTap;
 
   const CarTile({
     super.key,
     required this.car,
-    required this.editCar,
-    required this.deleteCar,
     required this.onTap,
     required this.onButtonTap,
   });
@@ -22,28 +18,7 @@ class CarTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Slidable(
-        endActionPane: ActionPane(
-          motion: const StretchMotion(),
-          children: [
-            // Edit option
-            SlidableAction(
-              onPressed: editCar,
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              icon: Icons.edit,
-              borderRadius: BorderRadius.circular(8),
-            ),
-
-            // Delete option
-            SlidableAction(
-              onPressed: deleteCar,
-              backgroundColor: Colors.red,
-              icon: Icons.delete,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ],
-        ),
-        child: Container(
+      child: Container(
           margin: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.secondary,
@@ -161,7 +136,6 @@ class CarTile extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }
