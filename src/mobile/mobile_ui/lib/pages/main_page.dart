@@ -7,6 +7,7 @@ import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/models/own_car.dart';
 import 'package:mobile_ui/pages/car_details_page.dart';
+import 'package:mobile_ui/pages/chatbot_page.dart';
 import 'package:mobile_ui/pages/own_car_details_page.dart';
 import 'package:mobile_ui/services/api_service.dart';
 import 'package:mobile_ui/services/auth_service.dart';
@@ -545,11 +546,37 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         drawer: const MyDrawer(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: addNewOwnCar,
-          elevation: 0,
-          backgroundColor: Theme.of(context).colorScheme.tertiary,
-          child: const Icon(Icons.add),
+        floatingActionButton: Stack(
+          children: [
+            // Add Car Button
+            Positioned(
+              bottom: 5, // Offset for positioning
+              right: 18,
+              child: FloatingActionButton(
+                onPressed: addNewOwnCar,
+                elevation: 0,
+                backgroundColor: Theme.of(context).colorScheme.tertiary,
+                child: const Icon(Icons.add),
+              ),
+            ),
+
+            // Chatbot Button
+            Positioned(
+              bottom: 5, // Offset for positioning
+              left: 45,
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ChatbotPage()),
+                  );
+                },
+                elevation: 0,
+                backgroundColor: Theme.of(context).colorScheme.tertiary,
+                child: const Icon(Icons.chat),
+              ),
+            ),
+          ],
         ),
         body: Center(
           child: Column(
