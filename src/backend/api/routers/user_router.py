@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
+from db.tables.models import User
 from db.database import get_db
 from api.services.user_service import (
     add_favourite_service,
@@ -14,7 +15,7 @@ from api.services.user_service import (
     add_own_car_service,
     add_following_service
 )
-from api.models.response_models import CarResponse, UserDataResponse, List
+from api.models.response_models import CarResponse, SearchedUserResponse, UserDataResponse, List
 from api.models.request_models import UserUpdate, NewOwnCarRequest
 from api.repositories.save_file import save_file
 
@@ -87,4 +88,38 @@ def get_following(user_id: int, db: Session = Depends(get_db)):
 @user_router.delete("/user/{user_id}/following/{following_id}")
 def delete_following(user_id: int, following_id: int, db: Session = Depends(get_db)):
     return delete_following_service(user_id, following_id, db)
+
+
+@user_router.get("/search_users", response_model=List[SearchedUserResponse])
+def search_users(
+    query: str = Query(..., min_length=1, description="Search query for first or last name"),
+    db: Session = Depends(get_db)
+):
+    keywords = query.split()
+    
+    if len(keywords) == 1:
+        users = db.query(User).filter(
+            (User.first_name.ilike(f"%{keywords[0]}%")) | 
+            (User.last_name.ilike(f"%{keywords[0]}%"))
+        ).all()
+    elif len(keywords) >= 2:
+        first_name_query = keywords[0]
+        last_name_query = keywords[1]
+        
+        users = db.query(User).filter(
+            (User.first_name.ilike(f"%{first_name_query}%")) & 
+            (User.last_name.ilike(f"%{last_name_query}%"))
+        ).all()
+    else:
+        users = []
+
+    response = [
+        SearchedUserResponse(
+            id=user.id,
+            name=f"{user.first_name} {user.last_name}"
+        )
+        for user in users
+    ]
+
+    return response
 

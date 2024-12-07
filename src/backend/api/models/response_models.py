@@ -4,6 +4,10 @@ from typing import List, Optional
 import os
 import base64
 
+class SearchedUserResponse(BaseModel):
+    id: int
+    name: str
+
 class CarResponse(BaseModel):
     model: str 
     km: int 
