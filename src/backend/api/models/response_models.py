@@ -5,6 +5,7 @@ import os
 import base64
 
 class CarResponse(BaseModel):
+    id: int
     model: str 
     km: int 
     year: int 

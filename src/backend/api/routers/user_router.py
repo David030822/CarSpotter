@@ -3,10 +3,12 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from api.services.user_service import (
     add_favourite_service,
+    delete_own_car_service,
     get_favourites_service,
     remove_favourite_service,
     get_own_cars_service,
     get_user_data_service,
+    update_own_car_service,
     update_user_data_service,
     update_user_image_service,
     add_own_car_service
@@ -32,6 +34,20 @@ def remove_favourite(user_id: int, dealer_id: int, db: Session = Depends(get_db)
 @user_router.get("/user/{user_id}/owncars", response_model=List[CarResponse])
 def get_own_cars(user_id: int, db: Session = Depends(get_db)):
     return get_own_cars_service(user_id, db)
+
+@user_router.put("/user/{user_id}/owncar/{own_car_id}")
+def update_own_car(user_id: int, own_car_id: int, updated_own_car: NewOwnCarRequest, db: Session = Depends(get_db)):
+    result = update_own_car_service(user_id, updated_own_car, own_car_id, db)
+    if not result:
+        raise HTTPException(status_code=500, detail="Failed to update car")
+    return result
+
+@user_router.delete("/user/{user_id}/owncar/{own_car_id}")
+def deletet_own_car(user_id: int, own_car_id: int, db: Session = Depends(get_db)):
+    result = delete_own_car_service(user_id, own_car_id, db)
+    if not result:
+        raise HTTPException(status_code=500, detail="Failed to delete car")
+    return result
 
 @user_router.get("/user/{user_id}", response_model=UserDataResponse)
 def get_user_data(user_id: int, db: Session = Depends(get_db)):

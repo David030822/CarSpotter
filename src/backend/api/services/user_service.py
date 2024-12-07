@@ -5,12 +5,14 @@ from api.models.request_models import UserUpdate, NewOwnCarRequest
 from api.repositories.dealer_car_repository import get_dealer_by_id
 from pathlib import Path 
 from api.repositories.user_repository import (
+    delete_own_car,
     get_favourite,
     add_favourite,
     remove_favourite,
     get_user_by_id,
     get_own_cars_by_user,
     get_favourite_dealers_by_user,
+    update_own_car,
     update_user_repository,
     add_car_to_db
 )
@@ -60,6 +62,24 @@ def get_own_cars_service(user_id: int, db: Session):
         raise HTTPException(status_code=404, detail="User not found")
     
     return get_own_cars_by_user(db, user_id)
+
+def update_own_car_service(user_id: int, updated_own_car: NewOwnCarRequest, own_car_id: int, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    result = update_own_car(db=db, user_id=user_id, updated_own_car=updated_own_car, own_car_id=own_car_id)
+    
+    return result
+
+def delete_own_car_service(user_id: int, own_car_id: int, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return delete_own_car(db, user_id, own_car_id)
+
+
+
 
 def get_user_data_service(user_id: int, db: Session):
     user = get_user_by_id(db, user_id)
