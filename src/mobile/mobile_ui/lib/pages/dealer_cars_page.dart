@@ -38,15 +38,19 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
           children: [
             Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 25, bottom: 10),
-                  child: Text(
-                      'Cars from ${widget.name}',
-                      style: GoogleFonts.dmSerifText(
-                        fontSize: 24,
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                      )
-                    ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 25, bottom: 10),
+                    child: Text(
+                        'Cars from ${widget.name}',
+                        style: GoogleFonts.dmSerifText(
+                          fontSize: 24,
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                  ),
                 ),
               ],
             ),

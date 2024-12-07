@@ -82,21 +82,18 @@ class _MyDrawerState extends State<MyDrawer> {
                   title: 'P R O F I L E',
                   leading: const Icon(Icons.person),
                   onTap: () {
-                    if (_user != null) {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProfilePage(user: _user!),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("User data is not loaded yet")),
-                      );
-                    }
+                    // Itt most statikus adatokat jelenítünk meg, nem kérjük le az adatokat
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilePage(), // Ne adjunk át user adatot
+                      ),
+                    );
                   },
                 ),
+
+                // stats tile
                 DrawerTile(
                   title: 'S T A T I S T I S T I C S',
                   leading: const Icon(Icons.show_chart),
@@ -148,7 +145,7 @@ class _MyDrawerState extends State<MyDrawer> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => AboutPage()),
+                        MaterialPageRoute(builder: (context) => const AboutPage()),
                       );
                     }),
               ],
