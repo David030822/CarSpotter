@@ -9,8 +9,9 @@ import 'package:mobile_ui/pages/statistics_page.dart';
 class DealerCarsPage extends StatefulWidget {
   final List<Car> cars;
   final String name;
+  List<Car> soldCars = [];
 
-  const DealerCarsPage({
+  DealerCarsPage({
     super.key,
     required this.cars,
     required this.name,

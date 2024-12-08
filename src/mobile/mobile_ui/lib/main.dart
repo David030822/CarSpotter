@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
+import 'package:mobile_ui/databases/event_database.dart';
 import 'package:mobile_ui/databases/note_database.dart';
 import 'package:mobile_ui/pages/favourites_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
@@ -29,6 +29,9 @@ void main() async{
   }
  
   // initialize databases
+  await EventDatabase.initialize();
+  await EventDatabase().saveFirstLaunchDate();
+  
   await NoteDatabase.initialize();
   await NoteDatabase().saveFirstLaunchDate();
 
@@ -37,6 +40,9 @@ void main() async{
       providers: [
         // Theme Provider
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
+
+        // Events Provider
+        ChangeNotifierProvider(create: (context) => EventDatabase()),
 
         // Notes Provider
         ChangeNotifierProvider(create: (context) => NoteDatabase()),

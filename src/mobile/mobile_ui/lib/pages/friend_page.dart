@@ -119,7 +119,7 @@ class _FriendPageState extends State<FriendPage> {
               child: Text(
                 'User profile page',
                 style: GoogleFonts.dmSerifText(
-                  fontSize: 48,
+                  fontSize: 36,
                   color: Theme.of(context).colorScheme.inversePrimary,
                 ),
               ),

@@ -154,13 +154,16 @@ class _FriendsPageState extends State<FriendsPage> {
           if (_isUsersLoading)
             const CircularProgressIndicator()
           else
-           Text(
-              'Your friends will appear here',
-              style: GoogleFonts.dmSerifText(
-                fontSize: 24,
-                color: Theme.of(context).colorScheme.inversePrimary,
+           Padding(
+             padding: const EdgeInsets.only(top: 10, bottom: 10),
+             child: Text(
+                'Your friends will appear here',
+                style: GoogleFonts.dmSerifText(
+                  fontSize: 24,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
               ),
-            ),
+           ),
             Expanded(
               child: ListView.builder(
                 itemCount: _friendsList.length,
