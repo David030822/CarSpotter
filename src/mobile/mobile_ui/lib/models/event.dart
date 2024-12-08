@@ -10,11 +10,5 @@ class Event {
   // event name
   late String name;
   late String type;
-
-  // completed days
-  List<DateTime> completedDays = [
-    // DateTime(year, month, day),
-    // DateTime(2024, 8, 22),
-    // DateTime(2024, 8, 23),
-  ];
+  late DateTime date;
 }

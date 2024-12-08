@@ -17,10 +17,10 @@ const EventSchema = CollectionSchema(
   name: r'Event',
   id: 2102939193127251002,
   properties: {
-    r'completedDays': PropertySchema(
+    r'date': PropertySchema(
       id: 0,
-      name: r'completedDays',
-      type: IsarType.dateTimeList,
+      name: r'date',
+      type: IsarType.dateTime,
     ),
     r'name': PropertySchema(
       id: 1,
@@ -53,7 +53,6 @@ int _eventEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.completedDays.length * 8;
   bytesCount += 3 + object.name.length * 3;
   bytesCount += 3 + object.type.length * 3;
   return bytesCount;
@@ -65,7 +64,7 @@ void _eventSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeDateTimeList(offsets[0], object.completedDays);
+  writer.writeDateTime(offsets[0], object.date);
   writer.writeString(offsets[1], object.name);
   writer.writeString(offsets[2], object.type);
 }
@@ -77,7 +76,7 @@ Event _eventDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Event();
-  object.completedDays = reader.readDateTimeList(offsets[0]) ?? [];
+  object.date = reader.readDateTime(offsets[0]);
   object.id = id;
   object.name = reader.readString(offsets[1]);
   object.type = reader.readString(offsets[2]);
@@ -92,7 +91,7 @@ P _eventDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readDateTimeList(offset) ?? []) as P;
+      return (reader.readDateTime(offset)) as P;
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
@@ -190,45 +189,43 @@ extension EventQueryWhere on QueryBuilder<Event, Event, QWhereClause> {
 }
 
 extension EventQueryFilter on QueryBuilder<Event, Event, QFilterCondition> {
-  QueryBuilder<Event, Event, QAfterFilterCondition> completedDaysElementEqualTo(
+  QueryBuilder<Event, Event, QAfterFilterCondition> dateEqualTo(
       DateTime value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'completedDays',
+        property: r'date',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Event, Event, QAfterFilterCondition>
-      completedDaysElementGreaterThan(
+  QueryBuilder<Event, Event, QAfterFilterCondition> dateGreaterThan(
     DateTime value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'completedDays',
+        property: r'date',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Event, Event, QAfterFilterCondition>
-      completedDaysElementLessThan(
+  QueryBuilder<Event, Event, QAfterFilterCondition> dateLessThan(
     DateTime value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'completedDays',
+        property: r'date',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Event, Event, QAfterFilterCondition> completedDaysElementBetween(
+  QueryBuilder<Event, Event, QAfterFilterCondition> dateBetween(
     DateTime lower,
     DateTime upper, {
     bool includeLower = true,
@@ -236,97 +233,12 @@ extension EventQueryFilter on QueryBuilder<Event, Event, QFilterCondition> {
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'completedDays',
+        property: r'date',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
       ));
-    });
-  }
-
-  QueryBuilder<Event, Event, QAfterFilterCondition> completedDaysLengthEqualTo(
-      int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        length,
-        true,
-        length,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<Event, Event, QAfterFilterCondition> completedDaysIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        0,
-        true,
-        0,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<Event, Event, QAfterFilterCondition> completedDaysIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        0,
-        false,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<Event, Event, QAfterFilterCondition> completedDaysLengthLessThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        0,
-        true,
-        length,
-        include,
-      );
-    });
-  }
-
-  QueryBuilder<Event, Event, QAfterFilterCondition>
-      completedDaysLengthGreaterThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        length,
-        include,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<Event, Event, QAfterFilterCondition> completedDaysLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        lower,
-        includeLower,
-        upper,
-        includeUpper,
-      );
     });
   }
 
@@ -644,6 +556,18 @@ extension EventQueryObject on QueryBuilder<Event, Event, QFilterCondition> {}
 extension EventQueryLinks on QueryBuilder<Event, Event, QFilterCondition> {}
 
 extension EventQuerySortBy on QueryBuilder<Event, Event, QSortBy> {
+  QueryBuilder<Event, Event, QAfterSortBy> sortByDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'date', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Event, Event, QAfterSortBy> sortByDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'date', Sort.desc);
+    });
+  }
+
   QueryBuilder<Event, Event, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -670,6 +594,18 @@ extension EventQuerySortBy on QueryBuilder<Event, Event, QSortBy> {
 }
 
 extension EventQuerySortThenBy on QueryBuilder<Event, Event, QSortThenBy> {
+  QueryBuilder<Event, Event, QAfterSortBy> thenByDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'date', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Event, Event, QAfterSortBy> thenByDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'date', Sort.desc);
+    });
+  }
+
   QueryBuilder<Event, Event, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -708,9 +644,9 @@ extension EventQuerySortThenBy on QueryBuilder<Event, Event, QSortThenBy> {
 }
 
 extension EventQueryWhereDistinct on QueryBuilder<Event, Event, QDistinct> {
-  QueryBuilder<Event, Event, QDistinct> distinctByCompletedDays() {
+  QueryBuilder<Event, Event, QDistinct> distinctByDate() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'completedDays');
+      return query.addDistinctBy(r'date');
     });
   }
 
@@ -736,10 +672,9 @@ extension EventQueryProperty on QueryBuilder<Event, Event, QQueryProperty> {
     });
   }
 
-  QueryBuilder<Event, List<DateTime>, QQueryOperations>
-      completedDaysProperty() {
+  QueryBuilder<Event, DateTime, QQueryOperations> dateProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'completedDays');
+      return query.addPropertyName(r'date');
     });
   }
 

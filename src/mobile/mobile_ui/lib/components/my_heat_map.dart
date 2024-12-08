@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
+import 'package:mobile_ui/util/event_util.dart';
 
 class MyHeatMap extends StatelessWidget {
   final Map<DateTime, int>? datasets;
@@ -24,13 +25,7 @@ class MyHeatMap extends StatelessWidget {
       showText: true,
       scrollable: true,
       size: 30,
-      colorsets: {
-        1: Colors.green.shade200,
-        2: Colors.green.shade300,
-        3: Colors.green.shade400,
-        4: Colors.green.shade500,
-        5: Colors.green.shade600,
-      }
+      colorsets: getColorSets(),
     );
   }
 }

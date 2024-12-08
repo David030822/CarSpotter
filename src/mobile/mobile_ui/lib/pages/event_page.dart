@@ -207,9 +207,9 @@ class _EventsPageState extends State<EventsPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: Text(
-                  'Set your own events',
+                  'Track car sales and purchases',
                   style: GoogleFonts.dmSerifText(
-                  fontSize: 24,
+                  fontSize: 20,
                   color: Theme.of(context).colorScheme.inversePrimary,
                   ),
                 ),

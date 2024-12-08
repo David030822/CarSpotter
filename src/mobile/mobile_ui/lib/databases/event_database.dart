@@ -63,9 +63,15 @@ class EventDatabase extends ChangeNotifier {
 
   // C R E A T E - add new event
   Future<void> addEvent(String eventName, String eventType) async {
+    // get current date
+    final today = DateTime.now();
+    final normalizedDate = DateTime(today.year, today.month, today.day);
+
     // create new event
-    final newEvent = Event()..name = eventName;
-    newEvent.type = eventType;
+    final newEvent = Event()
+      ..name = eventName
+      ..type = eventType
+      ..date = normalizedDate;
 
     // save to db
     await isar.writeTxn(() => isar.events.put(newEvent));
@@ -85,48 +91,6 @@ class EventDatabase extends ChangeNotifier {
 
     // update UI
     notifyListeners();
-  }
-
-  // U P D A T E - check event on and off
-  Future<void> updateEventCompletion(int id, bool isCompleted) async {
-    // find the specific event
-    final event = await isar.events.get(id);
-
-    // update completion status
-    if (event != null) {
-      await isar.writeTxn(() async {
-        // if event is completed -> add the current date to the completedDays list
-        if (isCompleted && !event.completedDays.contains(DateTime.now())) {
-          // today
-          final today = DateTime.now();
-
-          // add the current date
-          event.completedDays.add(
-            DateTime(
-              today.year,
-              today.month,
-              today.day,
-            ),
-          );
-        }
-
-        // if event is NOT completed -> remove the current date from the list
-        else {
-          // remove current date
-          event.completedDays.removeWhere(
-            (date) =>
-                date.year == DateTime.now().year &&
-                date.month == DateTime.now().month &&
-                date.day == DateTime.now().day,
-          );
-        }
-        // save the updated events back to the db
-        await isar.events.put(event);
-      });
-    }
-
-    // re-read from db
-    readEvents();
   }
 
   // U P D A T E - edit event name
