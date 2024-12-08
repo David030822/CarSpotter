@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:mobile_ui/databases/note_database.dart';
 import 'package:mobile_ui/pages/favourites_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/login_page.dart';
@@ -27,11 +28,18 @@ void main() async{
     print("Firebase initialization failed: $e");
   }
  
+  // initialize databases
+  await NoteDatabase.initialize();
+  await NoteDatabase().saveFirstLaunchDate();
+
   runApp(
     MultiProvider(
       providers: [
         // Theme Provider
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
+
+        // Notes Provider
+        ChangeNotifierProvider(create: (context) => NoteDatabase()),
       ],
       child: const MyApp(),
     ),
@@ -44,7 +52,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mobile UI',
+      title: 'CarSpotter',
       theme: Provider.of<ThemeProvider>(context).themeData,
       debugShowCheckedModeBanner: false,
       home: ResponsiveLayout(
