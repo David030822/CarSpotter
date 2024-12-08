@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mobile_ui/components/car_tile.dart';
 import 'package:mobile_ui/components/my_drawer.dart';
 import 'package:mobile_ui/components/own_car_tile.dart';
-import 'package:mobile_ui/constants.dart';
-import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/models/own_car.dart';
-import 'package:mobile_ui/pages/car_details_page.dart';
 import 'package:mobile_ui/pages/chatbot_page.dart';
 import 'package:mobile_ui/pages/own_car_details_page.dart';
 import 'package:mobile_ui/services/api_service.dart';
