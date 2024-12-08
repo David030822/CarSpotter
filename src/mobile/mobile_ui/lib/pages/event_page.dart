@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_ui/components/event_tile.dart';
 import 'package:mobile_ui/components/my_drawer.dart';
+import 'package:mobile_ui/components/my_dropdown_button.dart';
 import 'package:mobile_ui/components/my_heat_map.dart';
 import 'package:mobile_ui/databases/event_database.dart';
 import 'package:mobile_ui/models/event.dart';
@@ -28,27 +30,49 @@ class _EventsPageState extends State<EventsPage> {
 
   // text controller
   final TextEditingController textController = TextEditingController();
+  // store type
+  String selectedEventType = eventTypes.first;
 
   // create new event
   void createNewEvent() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        content: TextField(
-          controller: textController,
-          decoration: const InputDecoration(
-            hintText: 'Create a new event',
-          ),
+        content: Column(
+          children: [
+            TextField(
+              controller: textController,
+              decoration: const InputDecoration(
+                hintText: 'Create a new event',
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            MyDropdownButton(
+              initialValue: selectedEventType,
+              onChanged: (String value) {
+                setState(() {
+                  selectedEventType = value;
+                });
+              },
+            ),
+          ],
         ),
         actions: [
           // save button
           MaterialButton(
             onPressed: () {
+              // get current date
+              DateTime now = DateTime.now();
+              String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+
               // get the new event name
-              String newEventName = textController.text;
+              String newEventName = '$selectedEventType ${textController.text} on $formattedDate';
+              String newEventType = selectedEventType;
 
               // save to db
-              context.read<EventDatabase>().addEvent(newEventName);
+              context.read<EventDatabase>().addEvent(newEventName, newEventType);
 
               // pop box
               Navigator.pop(context);
@@ -75,34 +99,48 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  // check event on & off
-  void checkEventOnOff(bool? value, Event event) {
-    // update event completion status
-    if (value != null) {
-      context.read<EventDatabase>().updateEventCompletion(event.id, value);
-    }
-  }
-
   // edit event box
   void editEventBox(Event event) {
+    // get the old event details
+    final eventDetails = parseEventName(event.name);
+    final eventName = eventDetails['name'];
+    final eventDate = eventDetails['date']!;
+
     // set the controller's text to the event's current name
-    textController.text = event.name;
+    textController.text = eventName!;
+    selectedEventType = event.type;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        content: TextField(
-          controller: textController,
+        content: Column(
+          children: [
+            TextField(
+              controller: textController,
+            ),
+
+            const SizedBox(height: 10),
+
+            MyDropdownButton(
+              initialValue: selectedEventType,
+              onChanged: (String value) {
+                setState(() {
+                  selectedEventType = value;
+                });
+              },
+            ),
+          ],
         ),
         actions: [
           // save button
           MaterialButton(
             onPressed: () {
-              // get the new event name
-              String newEventName = textController.text;
+              // get the new event name & type
+              String newEventType = selectedEventType;
+              String newEventName = '$newEventType ${textController.text} on $eventDate';
 
               // save to db
-              context.read<EventDatabase>().updateEventName(event.id, newEventName);
+              context.read<EventDatabase>().updateEvent(event.id, newEventName, newEventType);
 
               // pop box
               Navigator.pop(context);
@@ -240,14 +278,9 @@ class _EventsPageState extends State<EventsPage> {
         // get each individual event
         final event = currentEvents[index];
 
-        // check if the event is completed today
-        bool isCompletedToday = isEventCompletedToday(event.completedDays);
-
         // return event tile UI
         return EventTile(
-          text: event.name,
-          isCompleted: isCompletedToday,
-          onChanged: (value) => checkEventOnOff(value, event),
+          event: event,
           editEvent: (context) => editEventBox(event),
           deleteEvent: (context) => deleteEventBox(event),
         );

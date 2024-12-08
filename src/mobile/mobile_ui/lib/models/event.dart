@@ -9,6 +9,7 @@ class Event {
 
   // event name
   late String name;
+  late String type;
 
   // completed days
   List<DateTime> completedDays = [

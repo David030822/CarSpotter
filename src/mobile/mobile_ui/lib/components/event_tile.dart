@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:mobile_ui/models/event.dart';
 
 class EventTile extends StatelessWidget {
-  final String text;
-  final bool isCompleted;
-  final void Function(bool?)? onChanged;
+  final Event event;
   final void Function(BuildContext)? editEvent;
   final void Function(BuildContext)? deleteEvent;
 
   const EventTile({
     super.key,
-    required this.text,
-    required this.isCompleted,
-    required this.onChanged,
+    required this.event,
     required this.editEvent,
     required this.deleteEvent,
   });
@@ -42,29 +39,16 @@ class EventTile extends StatelessWidget {
             ),
           ],
         ),
-        child: GestureDetector(
-          onTap: () {
-            if (onChanged != null) {
-              // toggle completion status
-              onChanged!(!isCompleted);
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: isCompleted
-                  ? Colors.green
-                  : Theme.of(context).colorScheme.secondary,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.all(12),
-            child: ListTile(
-              title: Text(text),
-              leading: Checkbox(
-                value: isCompleted,
-                onChanged: onChanged,
-                activeColor: Colors.green,
-              ),
-            ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: event.type == 'Sold'
+                ? Colors.green
+                : Colors.red[400],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.all(12),
+          child: ListTile(
+            title: Text(event.name),
           ),
         ),
       ),

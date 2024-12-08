@@ -62,9 +62,10 @@ class EventDatabase extends ChangeNotifier {
   final List<Event> currentEvents = [];
 
   // C R E A T E - add new event
-  Future<void> addEvent(String eventName) async {
+  Future<void> addEvent(String eventName, String eventType) async {
     // create new event
     final newEvent = Event()..name = eventName;
+    newEvent.type = eventType;
 
     // save to db
     await isar.writeTxn(() => isar.events.put(newEvent));
@@ -129,7 +130,7 @@ class EventDatabase extends ChangeNotifier {
   }
 
   // U P D A T E - edit event name
-  Future<void> updateEventName(int id, String newName) async {
+  Future<void> updateEvent(int id, String newName, String newType) async {
     // find the specific event
     final event = await isar.events.get(id);
 
@@ -138,6 +139,7 @@ class EventDatabase extends ChangeNotifier {
       // update name
       await isar.writeTxn(() async {
         event.name = newName;
+        event.type = newType;
         // save updated event back to the db
         await isar.events.put(event);
       });

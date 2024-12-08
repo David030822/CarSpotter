@@ -3,14 +3,19 @@
 
 import 'package:mobile_ui/models/event.dart';
 
-bool isEventCompletedToday(List<DateTime> completedDays) {
-  final today = DateTime.now();
-  return completedDays.any(
-    (date) =>
-        date.year == today.year &&
-        date.month == today.month &&
-        date.day == today.day,
-  );
+Map<String, String> parseEventName(String eventName) {
+  final regex = RegExp(r'^(Sold|Bought) (.+) on (\d{4}-\d{2}-\d{2})$');
+  final match = regex.firstMatch(eventName);
+
+  if (match != null) {
+    return {
+      'type': match.group(1)!, // 'Sold' or 'Bought'
+      'name': match.group(2)!, // 'Audi A6'
+      'date': match.group(3)!, // '2024-12-08'
+    };
+  }
+
+  throw FormatException('Invalid event name format');
 }
 
 // prepare heat map dataset

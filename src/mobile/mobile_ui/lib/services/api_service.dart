@@ -14,7 +14,7 @@ import 'package:mobile_ui/models/user.dart';
 // uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 class ApiService {
-  static const String baseUrl = "https://1491-212-93-150-41.ngrok-free.app";
+  static const String baseUrl = "https://163e-212-93-150-118.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
