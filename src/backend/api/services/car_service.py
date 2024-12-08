@@ -40,7 +40,6 @@ def insert_cars_and_dealer_by_dealer_name(db: Session, dealer_name: str):
             continue
         if not car_data['km']:
             continue
-        print("before add", car_data['cylinder_capacity'])
         add_car(db, car_data)
         added_cars += 1
 
