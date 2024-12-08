@@ -7,6 +7,7 @@ from api.services.user_service import (
     delete_following_service,
     get_favourites_service,
     get_following_service,
+    is_followed_service,
     remove_favourite_service,
     get_own_cars_service,
     get_user_data_service,
@@ -89,8 +90,12 @@ def get_following(user_id: int, db: Session = Depends(get_db)):
 def delete_following(user_id: int, following_id: int, db: Session = Depends(get_db)):
     return delete_following_service(user_id, following_id, db)
 
+@user_router.get("/following/{user_id}/{following_id}")
+def is_following(user_id: int, following_id: int, db: Session = Depends(get_db)):
+    return is_followed_service(user_id, following_id, db)
 
-@user_router.get("/search_users", response_model=List[SearchedUserResponse])
+
+@user_router.get("/search_users", response_model=List[UserDataResponse])
 def search_users(
     query: str = Query(..., min_length=1, description="Search query for first or last name"),
     db: Session = Depends(get_db)
@@ -113,13 +118,5 @@ def search_users(
     else:
         users = []
 
-    response = [
-        SearchedUserResponse(
-            id=user.id,
-            name=f"{user.first_name} {user.last_name}"
-        )
-        for user in users
-    ]
-
-    return response
+    return [UserDataResponse.from_user(user) for user in users]
 

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 class User {
+  int id;
   String firstName;
   String lastName;
   String email;
@@ -10,6 +11,7 @@ class User {
   String? profileImage; // Store the base64 string
 
   User({
+    required this.id,
     required this.firstName,
     required this.lastName,
     required this.email,
@@ -20,6 +22,7 @@ class User {
   // Convert from JSON to User object
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
+      id: json['id'] ?? 0,
       firstName: json['first_name'] ?? '',
       lastName: json['last_name'] ?? '',
       email: json['email'] ?? '',
@@ -31,6 +34,7 @@ class User {
   // Convert User object to JSON
   Map<String, dynamic> toJson() {
     final map = {
+      'id': id,
       'first_name': firstName,
       'last_name': lastName,
       'email': email,

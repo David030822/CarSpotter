@@ -151,3 +151,10 @@ def delete_following_service(user_id: int, following_id: int, db: Session):
     if not user: 
         raise ValueError(f"User does not exist.")
     return {"message": "Following deleted successfully"}
+
+def is_followed_service(user_id: int, following_id: int, db: Session):
+    user = get_user_by_id(db, user_id= user_id)
+    if not user: 
+        raise ValueError(f"User does not exist.")
+
+    return is_followed(user_id, following_id, db)

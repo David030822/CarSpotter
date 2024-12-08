@@ -14,7 +14,8 @@ import 'package:mobile_ui/models/user.dart';
 // uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 class ApiService {
-  static const String baseUrl = "https://1491-212-93-150-41.ngrok-free.app";
+  //static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";  //Lori
+  static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
@@ -355,4 +356,118 @@ class ApiService {
       throw Exception('Failed to delete car: ${response.body}');
     }
   }
+
+  static Future<List<User>> searchUsers(String query) async {
+    final url = Uri.parse('$baseUrl/search_users?query=$query');
+    final token = await AuthService.getToken();
+
+    if (token == null) {
+        throw Exception("User is not authenticated");
+    }
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => User.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to search users: ${response.statusCode}');
+    }
+  }
+
+  static Future<void> addFollowing(int userId, int followingId) async {
+    final url = Uri.parse('$baseUrl/user/$userId/following/$followingId');
+    final token = await AuthService.getToken();
+
+    if (token == null) {
+      throw Exception("User is not authenticated");
+    }
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.post(url, headers: headers);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to add following: ${response.statusCode}');
+    }
+  }
+
+  static Future<List<User>> getFollowing(int userId) async {
+    final url = Uri.parse('$baseUrl/user/$userId/following');
+    final token = await AuthService.getToken();
+
+    if (token == null) {
+      throw Exception("User is not authenticated");
+    }
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => User.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to fetch following users: ${response.statusCode}');
+    }
+  }
+
+  static Future<void> deleteFollowing(int userId, int followingId) async {
+    final url = Uri.parse('$baseUrl/user/$userId/following/$followingId');
+    final token = await AuthService.getToken();
+
+    if (token == null) {
+      throw Exception("User is not authenticated");
+    }
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.delete(url, headers: headers);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete following: ${response.statusCode}');
+    }
+  }
+
+static Future<bool> isFollowing(int userId, int targetUserId) async {
+  final url = Uri.parse('$baseUrl/following/$userId/$targetUserId');
+  final token = await AuthService.getToken();
+
+  if (token == null) {
+    throw Exception("User is not logged in");
+  }
+
+  final headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Bearer $token',
+  };
+
+  final response = await http.get(url, headers: headers);
+
+  if (response.statusCode == 200) {
+    return response.body == 'true';
+  } else {
+    throw Exception('Failed to check following status: ${response.statusCode}');
+  }
+}
+
+
 }

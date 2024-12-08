@@ -4,10 +4,6 @@ from typing import List, Optional
 import os
 import base64
 
-class SearchedUserResponse(BaseModel):
-    id: int
-    name: str
-
 class CarResponse(BaseModel):
     id: int
     model: str 
@@ -29,6 +25,7 @@ class CarResponse(BaseModel):
         orm_mode = True
 
 class UserDataResponse(BaseModel):
+    id: int
     first_name: str
     last_name: str
     email: str
@@ -50,6 +47,7 @@ class UserDataResponse(BaseModel):
             profile_image = _get_default_image() 
 
         return UserDataResponse(
+            id=user.id,
             first_name=user.first_name,
             last_name=user.last_name,
             email=user.email,

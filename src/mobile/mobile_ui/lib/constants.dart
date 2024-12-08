@@ -14,41 +14,42 @@ var myDrawer = const MyDrawer();
 
 List<User> users = [
   User(
+    id: 0,
     firstName: 'David',
     lastName: 'Demeter',
     email: 'demeter.david@gmail.com',
     phoneNum: '0745805425',
   ),
-  User(
-  firstName: 'Emma',
-  lastName: 'Johnson',
-  email: 'emma.johnson@gmail.com',
-  phoneNum: '0765481234',
-  ),
-  User(
-    firstName: 'Liam',
-    lastName: 'Smith',
-    email: 'liam.smith@gmail.com',
-    phoneNum: '0754123467',
-  ),
-  User(
-    firstName: 'Sophia',
-    lastName: 'Brown',
-    email: 'sophia.brown@gmail.com',
-    phoneNum: '0773219876',
-  ),
-  User(
-    firstName: 'Noah',
-    lastName: 'Davis',
-    email: 'noah.davis@gmail.com',
-    phoneNum: '0723456789',
-  ),
-  User(
-    firstName: 'Ava',
-    lastName: 'Taylor',
-    email: 'ava.taylor@gmail.com',
-    phoneNum: '0734567890',
-  ),
+  // User(
+  // firstName: 'Emma',
+  // lastName: 'Johnson',
+  // email: 'emma.johnson@gmail.com',
+  // phoneNum: '0765481234',
+  // ),
+  // User(
+  //   firstName: 'Liam',
+  //   lastName: 'Smith',
+  //   email: 'liam.smith@gmail.com',
+  //   phoneNum: '0754123467',
+  // ),
+  // User(
+  //   firstName: 'Sophia',
+  //   lastName: 'Brown',
+  //   email: 'sophia.brown@gmail.com',
+  //   phoneNum: '0773219876',
+  // ),
+  // User(
+  //   firstName: 'Noah',
+  //   lastName: 'Davis',
+  //   email: 'noah.davis@gmail.com',
+  //   phoneNum: '0723456789',
+  // ),
+  // User(
+  //   firstName: 'Ava',
+  //   lastName: 'Taylor',
+  //   email: 'ava.taylor@gmail.com',
+  //   phoneNum: '0734567890',
+  // ),
 ];
 
 List<User> getUserList(){
