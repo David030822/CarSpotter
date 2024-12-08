@@ -9,6 +9,7 @@ class SearchedUserResponse(BaseModel):
     name: str
 
 class CarResponse(BaseModel):
+    id: int
     model: str 
     km: int 
     year: int 
