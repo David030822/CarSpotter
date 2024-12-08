@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_ui/components/custom_button.dart';
 import 'package:mobile_ui/models/user.dart';
 import 'dart:io';
 
@@ -14,6 +15,9 @@ class FriendPage extends StatefulWidget {
 
 class _FriendPageState extends State<FriendPage> {
   @override
+
+  void _followUser() {}
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -49,6 +53,23 @@ class _FriendPageState extends State<FriendPage> {
                       color: Theme.of(context).colorScheme.inversePrimary,
                     )
                   : null,
+            ),
+
+            const SizedBox(height: 10),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: CustomButton(
+                    color: Theme.of(context).colorScheme.tertiary,
+                    textColor: Theme.of(context).colorScheme.outline,
+                    onPressed: _followUser,
+                    label: '+ Follow',
+                  ),
+                ),
+              ],
             ),
 
             const SizedBox(height: 10),
