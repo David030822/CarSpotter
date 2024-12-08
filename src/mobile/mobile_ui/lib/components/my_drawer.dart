@@ -90,7 +90,7 @@ class MyDrawer extends StatelessWidget {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AboutPage()),
+                      MaterialPageRoute(builder: (context) => const AboutPage()),
                     );
                   },
                 ),
