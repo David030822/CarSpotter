@@ -21,9 +21,6 @@ dependencies:
   google_fonts: ^6.2.1
   google_nav_bar: ^5.0.6
   flutter_slidable: ^3.1.1
-  isar: ^3.1.0+1
-  isar_flutter_libs: ^3.1.0+1
-  path_provider: ^2.1.4
   image_picker: ^0.8.5+3
   permission_handler: ^10.2.0
   http: ^1.2.2
@@ -35,8 +32,11 @@ dependencies:
   firebase_core: ^2.3.0 
   firebase_auth: ^4.4.0
   google_sign_in: ^6.0.0
-  http_parser: ^4.0.0
-  mime: ^1.0.0
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.1.4
+  flutter_heatmap_calendar: ^1.0.5
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:

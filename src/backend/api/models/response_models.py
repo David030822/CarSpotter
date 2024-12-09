@@ -1,10 +1,23 @@
 from pydantic import BaseModel
-from datetime import date
-from typing import List, Optional
+from typing import Optional
 import os
 import base64
 
 class CarResponse(BaseModel):
+    id: int
+    model: str 
+    km: int 
+    year: int
+    price: float 
+    combustible: str 
+    gearbox: str 
+    body_type: str 
+    cylinder_capacity: int 
+    power: int 
+    id_post: int
+    img_url: str
+
+class OwnCarResponse(BaseModel):
     id: int
     model: str 
     km: int 

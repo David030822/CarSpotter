@@ -22,8 +22,6 @@ def add_car(db: Session, car_data: dict):
         car_data['dateof_post'] = datetime.strptime(car_data['dateof_post'], '%d.%m.%Y').date()
     except ValueError as e:
         raise ValueError(f"Invalid data format: {e}")
-
-    print("after add", car_data['cylinder_capacity'])
     db_car = Car(**car_data)
     db.add(db_car)
     db.commit()
@@ -80,3 +78,7 @@ def add_sold_car(db: Session, car_id: int, sold_price: float):
 def add_own_car(db: Session, own_car: OwnCar):
     db.add(own_car)
     db.commit()
+
+
+def get_dealer_by_dealer_id(db: Session, dealer_id: int):
+    return db.query(Dealer).filter(Dealer.id == dealer_id).first()

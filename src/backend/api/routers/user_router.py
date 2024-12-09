@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
 from db.tables.models import User
@@ -7,6 +8,7 @@ from api.services.user_service import (
     delete_following_service,
     get_favourites_service,
     get_following_service,
+    get_sold_cars_by_dealer_id_service,
     is_followed_service,
     remove_favourite_service,
     get_own_cars_service,
@@ -16,7 +18,7 @@ from api.services.user_service import (
     add_own_car_service,
     add_following_service
 )
-from api.models.response_models import CarResponse, UserDataResponse, List
+from api.models.response_models import CarResponse, OwnCarResponse, UserDataResponse
 from api.models.request_models import UserUpdate, NewOwnCarRequest
 from api.repositories.save_file import save_file
 
@@ -34,7 +36,7 @@ def get_favourites(user_id: int, db: Session = Depends(get_db)):
 def remove_favourite(user_id: int, dealer_id: int, db: Session = Depends(get_db)):
     return remove_favourite_service(user_id, dealer_id, db)
 
-@user_router.get("/user/{user_id}/owncars", response_model=List[CarResponse])
+@user_router.get("/user/{user_id}/owncars", response_model=List[OwnCarResponse])
 def get_own_cars(user_id: int, db: Session = Depends(get_db)):
     return get_own_cars_service(user_id, db)
 
@@ -93,6 +95,10 @@ def delete_following(user_id: int, following_id: int, db: Session = Depends(get_
 @user_router.get("/following/{user_id}/{following_id}")
 def is_following(user_id: int, following_id: int, db: Session = Depends(get_db)):
     return is_followed_service(user_id, following_id, db)
+
+@user_router.get("/sold_cars/{dealer_id}", response_model=List[CarResponse])
+def get_sold_cars_by_user_id(dealer_id: int, db: Session = Depends(get_db)):
+    return get_sold_cars_by_dealer_id_service(dealer_id, db)
 
 
 @user_router.get("/search_users", response_model=List[UserDataResponse])

@@ -69,21 +69,23 @@ class _DealerTileState extends State<DealerTile> {
                 ),
 
                 // name
-                Padding(
-                  padding: const EdgeInsets.only(right: 15.0),
-                  child: Column(
-                    children: [
-                      Text(
-                          widget.dealer.name,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.inversePrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 15.0),
+                    child: Column(
+                      children: [
+                        Text(
+                            widget.dealer.name,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.inversePrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
