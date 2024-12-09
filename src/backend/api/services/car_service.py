@@ -108,24 +108,4 @@ def get_cars_by_dealer_id(db: Session, dealer_id: int):
     
     sold_car_ids = [soldCar.car_id for soldCar in db.query(SoldCar)]
     cars = [car for car in cars if car.id not in sold_car_ids]
-
-    return {
-        "cars": [
-            {
-                "id": car.id,
-                "model": car.model,
-                "km": car.km,
-                "year": car.year,
-                "price": car.price,
-                "combustible": car.combustible,
-                "gearbox": car.gearbox,
-                "body_type": car.body_type,
-                "cylinder_capacity": car.cylinder_capacity,
-                "power": car.power,
-                "dateof_post": car.dateof_post,
-                "id_post": car.id_post,
-                "img_url": car.img_url,
-            }
-            for car in cars
-        ]
-    }
+    return cars

@@ -10,6 +10,7 @@ from api.repositories.user_repository import (
     get_favourite,
     add_favourite,
     get_following,
+    get_sold_cars_by_dealer_id,
     is_followed,
     remove_favourite,
     get_user_by_id,
@@ -158,3 +159,10 @@ def is_followed_service(user_id: int, following_id: int, db: Session):
         raise ValueError(f"User does not exist.")
 
     return is_followed(user_id, following_id, db)
+
+
+def get_sold_cars_by_dealer_id_service(dealer_id: int, db: Session):
+    dealer = get_dealer_by_id(db, dealer_id)
+    if not dealer: 
+        raise ValueError(f"dealer does not exist.")
+    return get_sold_cars_by_dealer_id(dealer_id, db)
