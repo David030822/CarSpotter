@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:mobile_ui/models/monthly_sales.dart';
 import 'package:mobile_ui/models/own_car.dart';
+import 'package:mobile_ui/models/weekly_sales.dart';
 import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
@@ -60,13 +62,14 @@ class ApiService {
     }
   }
 
-  static Future<int?> getCarIdFromResponse(Map<String, dynamic> response) async {
+  static Future<int?> getCarIdFromResponse(
+      Map<String, dynamic> response) async {
     if (response.isEmpty) {
       return null; // Return null if the response is empty
     }
 
     // Extract the car ID from the response payload
-    int? carId = response['id']; 
+    int? carId = response['id'];
 
     return carId;
   }
@@ -298,7 +301,8 @@ class ApiService {
     }
   }
 
-  static Future<void> editOwnCar(int userId, int carId, OwnCar updatedCar) async {
+  static Future<void> editOwnCar(
+      int userId, int carId, OwnCar updatedCar) async {
     final url = Uri.parse('$baseUrl/user/$userId/owncar/$carId');
     final token = await AuthService.getToken();
 
@@ -362,7 +366,7 @@ class ApiService {
     final token = await AuthService.getToken();
 
     if (token == null) {
-        throw Exception("User is not authenticated");
+      throw Exception("User is not authenticated");
     }
     final headers = {
       'Content-Type': 'application/json',
@@ -421,7 +425,8 @@ class ApiService {
       final List<dynamic> jsonList = json.decode(response.body);
       return jsonList.map((json) => User.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to fetch following users: ${response.statusCode}');
+      throw Exception(
+          'Failed to fetch following users: ${response.statusCode}');
     }
   }
 
@@ -446,10 +451,34 @@ class ApiService {
     }
   }
 
-static Future<bool> isFollowing(int userId, int targetUserId) async {
-  final url = Uri.parse('$baseUrl/following/$userId/$targetUserId');
-  final token = await AuthService.getToken();
+  static Future<bool> isFollowing(int userId, int targetUserId) async {
+    final url = Uri.parse('$baseUrl/following/$userId/$targetUserId');
+    final token = await AuthService.getToken();
 
+    if (token == null) {
+      throw Exception("User is not logged in");
+    }
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      return response.body == 'true';
+    } else {
+      throw Exception(
+          'Failed to check following status: ${response.statusCode}');
+    }
+  }
+
+static Future<Map<String, List<dynamic>>> fetchSalesData(int userId) async {
+  final url = Uri.parse('$baseUrl/statistics/$userId');
+
+  final token = await AuthService.getToken();
   if (token == null) {
     throw Exception("User is not logged in");
   }
@@ -463,11 +492,59 @@ static Future<bool> isFollowing(int userId, int targetUserId) async {
   final response = await http.get(url, headers: headers);
 
   if (response.statusCode == 200) {
-    return response.body == 'true';
+    final data = json.decode(response.body);
+
+    final weeklySales = (data['weekly_sales'] as List<dynamic>)
+        .map((item) => WeeklySales.fromJson(item))
+        .toList();
+
+    final monthlySales = (data['monthly_sales'] as List<dynamic>)
+        .map((item) => MonthlySales.fromJson(item))
+        .toList();
+
+    return {
+      'weekly_sales': weeklySales,
+      'monthly_sales': monthlySales,
+    };
   } else {
-    throw Exception('Failed to check following status: ${response.statusCode}');
+    throw Exception('Failed to load sales data');
   }
 }
 
+static Future<Map<String, List<dynamic>>> fetchSalesDataForDealer(int dealerId) async {
+  final url = Uri.parse('$baseUrl/dealer_statistics/$dealerId');
+
+  final token = await AuthService.getToken();
+  if (token == null) {
+    throw Exception("User is not logged in");
+  }
+
+  final headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Bearer $token',
+  };
+
+  final response = await http.get(url, headers: headers);
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+
+    final weeklySales = (data['weekly_sales'] as List<dynamic>)
+        .map((item) => WeeklySales.fromJson(item))
+        .toList();
+
+    final monthlySales = (data['monthly_sales'] as List<dynamic>)
+        .map((item) => MonthlySales.fromJson(item))
+        .toList();
+
+    return {
+      'weekly_sales': weeklySales,
+      'monthly_sales': monthlySales,
+    };
+  } else {
+    throw Exception('Failed to load sales data');
+  }
+}
 
 }

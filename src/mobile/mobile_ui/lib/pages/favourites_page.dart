@@ -89,6 +89,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
                                 builder: (context) => DealerCarsPage(
                                   cars: cars,
                                   name: dealer.name,
+                                  dealerId: dealer.id,
                                 ),
                               ),
                             );

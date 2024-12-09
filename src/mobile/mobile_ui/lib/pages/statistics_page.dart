@@ -1,30 +1,107 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_ui/models/bar_data.dart';
+import 'package:mobile_ui/models/monthly_sales.dart';
+import 'package:mobile_ui/models/pie_data.dart';
+import 'package:mobile_ui/models/weekly_sales.dart';
+import 'package:mobile_ui/services/auth_service.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:mobile_ui/services/api_service.dart';
 
-class StatisticsPage extends StatelessWidget {
-  final List<_BarData> weeklySalesData = [
-    _BarData('Mon', 5),
-    _BarData('Tue', 8),
-    _BarData('Wed', 10),
-    _BarData('Thu', 7),
-    _BarData('Fri', 12),
-    _BarData('Sat', 6),
-    _BarData('Sun', 9),
-  ];
+class StatisticsPage extends StatefulWidget {
+  final bool isUser;
+  final int dealerId;
 
-  final List<_PieData> monthlySalesData = [
-    _PieData('Jan', 20),
-    _PieData('Feb', 30),
-    _PieData('Mar', 25),
-    _PieData('Apr', 40),
-    _PieData('May', 35),
-    _PieData('Jun', 50),
-    _PieData('Jul', 45),
-  ];
+  const StatisticsPage(
+      {super.key, required this.isUser, required this.dealerId});
+
+  @override
+  _StatisticsPageState createState() => _StatisticsPageState();
+}
+
+class _StatisticsPageState extends State<StatisticsPage> {
+  List<BarData> weeklySalesData = [];
+  List<PieData> monthlySalesData = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isUser) {
+      fetchData();
+    } else {
+      fetchDataForDealer();
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchData() async {
+    try {
+      final token = await AuthService.getToken();
+      if (token == null) {
+        throw Exception("User is not logged in");
+      }
+      final userId = await AuthService.getUserIdFromToken(token);
+      if (userId == null) {
+        throw Exception("Invalid user ID");
+      }
+      final salesData = await ApiService.fetchSalesData(userId);
+      setState(() {
+        weeklySalesData = (salesData['weekly_sales'] as List<WeeklySales>)
+            .map((item) => BarData(item.day, item.sales))
+            .toList();
+
+        monthlySalesData = (salesData['monthly_sales'] as List<MonthlySales>)
+            .map((item) => PieData(item.month, item.sales))
+            .toList();
+
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print("Error fetching data: $e");
+    }
+  }
+
+  Future<void> fetchDataForDealer() async {
+    try {
+      final salesData = await ApiService.fetchSalesDataForDealer(widget.dealerId);
+      setState(() {
+        weeklySalesData = (salesData['weekly_sales'] as List<WeeklySales>)
+            .map((item) => BarData(item.day, item.sales))
+            .toList();
+
+        monthlySalesData = (salesData['monthly_sales'] as List<MonthlySales>)
+            .map((item) => PieData(item.month, item.sales))
+            .toList();
+
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print("Error fetching data: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Car Sales Statistics'),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
@@ -53,22 +130,23 @@ class StatisticsPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  height: 300,
-                  child: SfCartesianChart(
-                    primaryXAxis: CategoryAxis(),
-                    series: <ChartSeries<_BarData, String>>[
-                      ColumnSeries<_BarData, String>(
-                        dataSource: weeklySalesData,
-                        xValueMapper: (_BarData data, _) => data.xData,
-                        yValueMapper: (_BarData data, _) => data.yData,
-                        color: Colors.blue,
-                        dataLabelSettings: DataLabelSettings(isVisible: true),
-                      ),
-                    ],
+                if (weeklySalesData.isNotEmpty)
+                  Container(
+                    height: 300,
+                    child: SfCartesianChart(
+                      primaryXAxis: CategoryAxis(),
+                      series: <ChartSeries<BarData, String>>[
+                        ColumnSeries<BarData, String>(
+                          dataSource: weeklySalesData,
+                          xValueMapper: (BarData data, _) => data.xData,
+                          yValueMapper: (BarData data, _) => data.yData,
+                          color: Colors.blue,
+                          dataLabelSettings: DataLabelSettings(isVisible: true),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 40), 
+                SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 20),
                   child: Text(
@@ -79,24 +157,26 @@ class StatisticsPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  height: 300,
-                  child: SfCircularChart(
-                    legend: Legend(
-                      isVisible: true,
-                      overflowMode: LegendItemOverflowMode.wrap, 
-                    ),
-                    series: <PieSeries<_PieData, String>>[
-                      PieSeries<_PieData, String>(
-                        dataSource: monthlySalesData,
-                        xValueMapper: (_PieData data, _) => data.xData,
-                        yValueMapper: (_PieData data, _) => data.yData,
-                        dataLabelMapper: (_PieData data, _) => '${data.yData} cars',
-                        dataLabelSettings: DataLabelSettings(isVisible: true),
+                if (monthlySalesData.isNotEmpty)
+                  Container(
+                    height: 300,
+                    child: SfCircularChart(
+                      legend: Legend(
+                        isVisible: true,
+                        overflowMode: LegendItemOverflowMode.wrap,
                       ),
-                    ],
+                      series: <PieSeries<PieData, String>>[
+                        PieSeries<PieData, String>(
+                          dataSource: monthlySalesData,
+                          xValueMapper: (PieData data, _) => data.xData,
+                          yValueMapper: (PieData data, _) => data.yData,
+                          dataLabelMapper: (PieData data, _) =>
+                              '${data.yData} cars',
+                          dataLabelSettings: DataLabelSettings(isVisible: true),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -104,17 +184,4 @@ class StatisticsPage extends StatelessWidget {
       ),
     );
   }
-}
-
-
-class _BarData {
-  _BarData(this.xData, this.yData);
-  final String xData;
-  final num yData;
-}
-
-class _PieData {
-  _PieData(this.xData, this.yData);
-  final String xData;
-  final num yData;
 }

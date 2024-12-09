@@ -9,11 +9,13 @@ import 'package:mobile_ui/pages/statistics_page.dart';
 class DealerCarsPage extends StatefulWidget {
   final List<Car> cars;
   final String name;
+  final int dealerId;
 
   const DealerCarsPage({
     super.key,
     required this.cars,
     required this.name,
+    required this.dealerId
   });
 
   @override
@@ -21,7 +23,6 @@ class DealerCarsPage extends StatefulWidget {
 }
 
 class _DealerCarsPageState extends State<DealerCarsPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,47 +41,45 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 25, bottom: 10),
-                  child: Text(
-                      'Cars from ${widget.name}',
+                  child: Text('Cars from ${widget.name}',
                       style: GoogleFonts.dmSerifText(
                         fontSize: 24,
                         color: Theme.of(context).colorScheme.inversePrimary,
-                      )
-                    ),
+                      )),
                 ),
               ],
             ),
-
             Expanded(
               child: ListView.builder(
                 itemCount: widget.cars.length,
                 itemBuilder: (context, index) {
-                  return widget.cars.isEmpty ? Text(
-                    'No cars from\nthis dealer yet...',
-                    style: GoogleFonts.dmSerifText (
-                      fontSize: 24,
-                      color: Theme.of(context).colorScheme.inversePrimary,
-                    ),
-                  ) : CarTile(
-                      car: widget.cars[index],
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CarDetailsPage(car: widget.cars[index]),
+                  return widget.cars.isEmpty
+                      ? Text(
+                          'No cars from\nthis dealer yet...',
+                          style: GoogleFonts.dmSerifText(
+                            fontSize: 24,
+                            color: Theme.of(context).colorScheme.inversePrimary,
                           ),
+                        )
+                      : CarTile(
+                          car: widget.cars[index],
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    CarDetailsPage(car: widget.cars[index]),
+                              ),
+                            );
+                          },
+                          onButtonTap: () {
+                            // Handle button tap, e.g., edit car details
+                          },
                         );
-                      },
-                      onButtonTap: () {
-                        // Handle button tap, e.g., edit car details
-                      },
-                    );
-                  },
-                ),
+                },
+              ),
             ),
-
             const SizedBox(height: 15),
-
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: CustomButton(
@@ -90,7 +89,7 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => StatisticsPage(),
+                      builder: (context) => StatisticsPage(isUser: false, dealerId: widget.dealerId),
                     ),
                   );
                 },

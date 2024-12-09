@@ -150,6 +150,7 @@ class _SearchPageState extends State<SearchPage> {
                             builder: (context) => DealerCarsPage(
                               cars: _dealerCars,
                               name: dealer.name,
+                              dealerId: dealer.id,
                             ),
                           ),
                         );

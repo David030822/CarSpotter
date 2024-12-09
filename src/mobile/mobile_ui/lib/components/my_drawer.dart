@@ -63,7 +63,7 @@ class MyDrawer extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => StatisticsPage(),
+                        builder: (context) => const StatisticsPage(isUser: true, dealerId: 0),
                       ),
                     );
                   },

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
+from api.services.statistics_service import get_statistics_for_dealer_service, get_statistics_for_user_service
 from db.tables.models import User
 from db.database import get_db
 from api.services.user_service import (
@@ -16,7 +17,7 @@ from api.services.user_service import (
     add_own_car_service,
     add_following_service
 )
-from api.models.response_models import CarResponse, SearchedUserResponse, UserDataResponse, List
+from api.models.response_models import CarResponse, StatisticsResponse, UserDataResponse, List
 from api.models.request_models import UserUpdate, NewOwnCarRequest
 from api.repositories.save_file import save_file
 
@@ -119,4 +120,31 @@ def search_users(
         users = []
 
     return [UserDataResponse.from_user(user) for user in users]
+
+
+
+@user_router.get("/statistics/{user_id}", response_model=StatisticsResponse)
+def get_statistics_for_user(user_id: int, db: Session = Depends(get_db)):
+    try:
+        statistics = get_statistics_for_user_service(user_id=user_id, db=db)
+        return statistics
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    
+
+@user_router.get("/dealer_statistics/{dealer_id}", response_model=StatisticsResponse)
+def get_statistics_for_dealer(dealer_id: int, db: Session = Depends(get_db)):
+    try:
+        statistics = get_statistics_for_dealer_service(dealer_id, db)
+        return statistics
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+
+
 
