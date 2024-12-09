@@ -170,7 +170,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       const SizedBox(height: 25),
                       MyTextField(
                         controller: dealerNameController,
-                        hintText: 'Dealer inventory name (optional)',
+                        hintText: 'Dealer name(optional)',
                         obscureText: false,
                       ),
 

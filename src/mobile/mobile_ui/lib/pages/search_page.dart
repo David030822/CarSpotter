@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_ui/components/custom_button.dart';
 import 'package:mobile_ui/components/my_text_field.dart';
 import 'package:mobile_ui/components/dealer_tile.dart';
@@ -102,6 +103,12 @@ class _SearchPageState extends State<SearchPage> {
                 padding: const EdgeInsets.only(right: 20.0),
                 child: Column(
                   children: [
+                    Text('Search for registered dealers\nand see their cars',
+                      style: GoogleFonts.dmSerifText(
+                        fontSize: 24,
+                        color: Theme.of(context).colorScheme.inversePrimary,
+                      )
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

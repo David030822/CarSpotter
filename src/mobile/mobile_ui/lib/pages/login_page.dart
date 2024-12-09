@@ -104,37 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                         obscureText: true,
                       ),
 
-                      SizedBox(height: 10),
-
-                      // forgot password?
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ForgotPasswordPage(),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                'Forgot Password?',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.inversePrimary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      
-                      SizedBox(height: 25),
+                      const SizedBox(height: 40),
 
                       // sign in button
                       MyButton(
@@ -142,69 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                         onTap: loginUser,
                       ),
 
-                      SizedBox(height: 25),
-
-                      // or continue with
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                thickness: 0.5,
-                                color: Theme.of(context).colorScheme.secondary,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Text(
-                                'Or continue with',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.inversePrimary,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(
-                                thickness: 0.5,
-                                color: Theme.of(context).colorScheme.secondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: 50),
-
-                      // google 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // google button
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => GooglePage(),
-                                ),
-                              );
-                            },
-                            child: const SquareTile(
-                              height: 40,
-                              imagePath: 'assets/images/google.png',
-                            ),
-                          ),
-
-                          const SizedBox(width: 10),
-
-  
-                        ],
-                      
-                      ),
-
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 100),
 
                       // not a member? Register now
                       Row(

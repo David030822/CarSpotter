@@ -579,10 +579,11 @@ class _MainPageState extends State<MainPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('Your Cars',
-                  style: GoogleFonts.dmSerifText(
-                    fontSize: 36,
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                  )),
+                style: GoogleFonts.dmSerifText(
+                  fontSize: 36,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                )
+              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 80.0),
