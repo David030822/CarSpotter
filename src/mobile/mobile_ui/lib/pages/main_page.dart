@@ -763,10 +763,10 @@ class _MainPageState extends State<MainPage> {
                       return OwnCarTile(
                         ownCar: soldCar,
                         editCar: (context) {
-                          // Sold cars may not be editable
+                          editCarBox(soldCar);
                         },
                         deleteCar: (context) {
-                          // Sold cars may not be deletable
+                          deleteCarBox(soldCar);
                         },
                         onTap: () {
                           Navigator.push(
@@ -777,9 +777,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                           );
                         },
-                        onButtonTap: () {
-                          // Additional button tap action if needed
-                        },
+                        onButtonTap: () {},
                       );
                     },
                   ),

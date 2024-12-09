@@ -150,7 +150,7 @@ class OwnCarTile extends StatelessWidget {
                           ),
                         ),
                         child: const Icon(
-                          Icons.tune,
+                          Icons.euro,
                           color: Colors.white,
                         ),
                       ),
