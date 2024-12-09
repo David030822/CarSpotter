@@ -259,6 +259,7 @@ class _FriendPageState extends State<FriendPage> {
                                   cars: cars,
                                   name: dealer.name,
                                   soldCars: [],
+                                  dealerId: dealer.id,
                                 ),
                               ),
                             );

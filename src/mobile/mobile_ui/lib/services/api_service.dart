@@ -474,77 +474,122 @@ class ApiService {
           'Failed to check following status: ${response.statusCode}');
     }
   }
+    static Future<List<Car>> getSoldCarsByDealerId(int dealerId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/sold_cars/$dealerId'),
+    );
 
-static Future<Map<String, List<dynamic>>> fetchSalesData(int userId) async {
-  final url = Uri.parse('$baseUrl/statistics/$userId');
-
-  final token = await AuthService.getToken();
-  if (token == null) {
-    throw Exception("User is not logged in");
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => Car.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load cars: ${response.body}');
+    }
   }
 
-  final headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': 'Bearer $token',
-  };
+  static Future<List<OwnCar>> getOwnSoldCars(int userId) async {
+    final response = await http.get(Uri.parse('$baseUrl/sold_owncars/$userId'));
 
-  final response = await http.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      final List<dynamic> carList = jsonDecode(response.body);
+      return carList.map((json) => OwnCar.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load cars: ${response.body}');
+    }
+  }
 
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
+  static Future<void> sellOwnCar(int userId, int ownCarId, double sellFor) async {
+    final url = Uri.parse('$baseUrl/sell_owncar/$userId');
+    final body = json.encode({
+      'own_car_id': ownCarId,
+      'sell_for': sellFor,
+    });
 
-    final weeklySales = (data['weekly_sales'] as List<dynamic>)
-        .map((item) => WeeklySales.fromJson(item))
-        .toList();
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
 
-    final monthlySales = (data['monthly_sales'] as List<dynamic>)
-        .map((item) => MonthlySales.fromJson(item))
-        .toList();
+    if (response.statusCode == 200) {
+      print('Car sold successfully.');
+    } else {
+      throw Exception('Failed to sell car: ${response.body}');
+    }
+  }
 
-    return {
-      'weekly_sales': weeklySales,
-      'monthly_sales': monthlySales,
+  static Future<Map<String, List<dynamic>>> fetchSalesData(int userId) async {
+    final url = Uri.parse('$baseUrl/statistics/$userId');
+
+    final token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception("User is not logged in");
+    }
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
     };
-  } else {
-    throw Exception('Failed to load sales data');
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      final weeklySales = (data['weekly_sales'] as List<dynamic>)
+          .map((item) => WeeklySales.fromJson(item))
+          .toList();
+
+      final monthlySales = (data['monthly_sales'] as List<dynamic>)
+          .map((item) => MonthlySales.fromJson(item))
+          .toList();
+
+      return {
+        'weekly_sales': weeklySales,
+        'monthly_sales': monthlySales,
+      };
+    } else {
+      throw Exception('Failed to load sales data');
+    }
   }
-}
 
-static Future<Map<String, List<dynamic>>> fetchSalesDataForDealer(int dealerId) async {
-  final url = Uri.parse('$baseUrl/dealer_statistics/$dealerId');
+  static Future<Map<String, List<dynamic>>> fetchSalesDataForDealer(int dealerId) async {
+    final url = Uri.parse('$baseUrl/dealer_statistics/$dealerId');
 
-  final token = await AuthService.getToken();
-  if (token == null) {
-    throw Exception("User is not logged in");
-  }
+    final token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception("User is not logged in");
+    }
 
-  final headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': 'Bearer $token',
-  };
-
-  final response = await http.get(url, headers: headers);
-
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-
-    final weeklySales = (data['weekly_sales'] as List<dynamic>)
-        .map((item) => WeeklySales.fromJson(item))
-        .toList();
-
-    final monthlySales = (data['monthly_sales'] as List<dynamic>)
-        .map((item) => MonthlySales.fromJson(item))
-        .toList();
-
-    return {
-      'weekly_sales': weeklySales,
-      'monthly_sales': monthlySales,
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
     };
-  } else {
-    throw Exception('Failed to load sales data');
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      final weeklySales = (data['weekly_sales'] as List<dynamic>)
+          .map((item) => WeeklySales.fromJson(item))
+          .toList();
+
+      final monthlySales = (data['monthly_sales'] as List<dynamic>)
+          .map((item) => MonthlySales.fromJson(item))
+          .toList();
+
+      return {
+        'weekly_sales': weeklySales,
+        'monthly_sales': monthlySales,
+      };
+    } else {
+      throw Exception('Failed to load sales data');
+    }
   }
-}
 
 }

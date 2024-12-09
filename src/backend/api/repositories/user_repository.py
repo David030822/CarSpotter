@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from db.tables.models import Car, Followers, SoldCar, User,Favourite, OwnCar, Dealer
 from api.models.request_models import UserUpdate,NewOwnCarRequest
@@ -160,3 +161,56 @@ def sell_own_car(own_car_id: int, sell_for: float, db: Session):
     db.commit()
     db.refresh(car)
     return car
+
+def get_weekly_sales(user_id: int, start_of_previous_week: int, end_of_previous_week: int ,db: Session):
+    return db.query(
+        func.date(OwnCar.sold_date).label("day"),
+        func.count(OwnCar.id).label("sold_count")
+    ).filter(
+        OwnCar.user_id == user_id,
+        OwnCar.sold_date >= start_of_previous_week,
+        OwnCar.sold_date <= end_of_previous_week
+    ).group_by(func.date(OwnCar.sold_date)).all()
+
+def get_monthly_sales(user_id: int, db: Session):
+    today = datetime.now()
+    first_day_of_current_year = today.replace(month=1, day=1)
+    
+    result = db.query(
+        func.extract('month', OwnCar.sold_date).label("month"),
+        func.count(OwnCar.id).label("sold_count")
+    ).filter(
+        OwnCar.user_id == user_id,
+        OwnCar.sold_date >= first_day_of_current_year,
+        OwnCar.sold_date <= today  
+    ).group_by(func.extract('month', OwnCar.sold_date)).all()
+    return result
+
+
+def get_weekly_sales_dealer_cars(dealer_id: int, start_of_previous_week: int, end_of_previous_week: int ,db: Session):
+    result =  db.query(
+        func.date(SoldCar.sold_date).label("day"),
+        func.count(SoldCar.id).label("sold_count")
+    ).join(
+        Car, Car.id == SoldCar.car_id
+    ).filter(
+        Car.dealer_id == dealer_id,
+        SoldCar.sold_date >= start_of_previous_week,
+        SoldCar.sold_date <= end_of_previous_week  
+    ).group_by(func.date(SoldCar.sold_date)).all()
+    return result
+
+def get_monthly_sales_dealer_cars(dealer_id: int, db: Session):
+    today = datetime.now()
+    first_day_of_current_year = today.replace(month=1, day=1)
+    result = db.query(
+        func.extract('month', SoldCar.sold_date).label("month"),
+        func.count(SoldCar.id).label("sold_count")
+    ).join(
+        Car, Car.id == SoldCar.car_id
+    ).filter(
+        Car.dealer_id == dealer_id,
+        SoldCar.sold_date >= first_day_of_current_year,
+        SoldCar.sold_date <= today  
+    ).group_by(func.extract('month', SoldCar.sold_date)).all()
+    return result
