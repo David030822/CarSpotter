@@ -16,7 +16,7 @@ from api.services.user_service import (
     add_own_car_service,
     add_following_service
 )
-from api.models.response_models import CarResponse, SearchedUserResponse, UserDataResponse, List
+from api.models.response_models import CarResponse, UserDataResponse, List
 from api.models.request_models import UserUpdate, NewOwnCarRequest
 from api.repositories.save_file import save_file
 

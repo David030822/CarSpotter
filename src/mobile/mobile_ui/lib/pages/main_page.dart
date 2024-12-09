@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mobile_ui/components/car_tile.dart';
 import 'package:mobile_ui/components/my_drawer.dart';
 import 'package:mobile_ui/components/own_car_tile.dart';
-import 'package:mobile_ui/constants.dart';
-import 'package:mobile_ui/models/car.dart';
 import 'package:mobile_ui/models/own_car.dart';
-import 'package:mobile_ui/pages/car_details_page.dart';
 import 'package:mobile_ui/pages/chatbot_page.dart';
 import 'package:mobile_ui/pages/own_car_details_page.dart';
 import 'package:mobile_ui/services/api_service.dart';
@@ -22,6 +18,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   bool _isLoading = false;
   List<OwnCar> _myOwnCars = [];
+  List<OwnCar> _mySoldCars = [];
 
   // text editing controllers
   final TextEditingController _carNameController = TextEditingController();
@@ -35,8 +32,8 @@ class _MainPageState extends State<MainPage> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _buyPriceController = TextEditingController();
   final TextEditingController _spentController = TextEditingController();
-  final TextEditingController _soldFor = TextEditingController();
-  final TextEditingController _imagePath = TextEditingController();
+  final TextEditingController _soldForController = TextEditingController();
+  final TextEditingController _imagePathController = TextEditingController();
 
   void initState() {
     super.initState();
@@ -76,68 +73,71 @@ class _MainPageState extends State<MainPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        title: const Text('Enter new car details'),
         content: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
+                const Text('*Required'),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _carNameController,
                   decoration: const InputDecoration(
-                    hintText: 'Car name',
+                    hintText: 'Car name*',
                   ),
                 ),
                 TextField(
                   controller: _carYearController,
                   decoration: const InputDecoration(
-                    hintText: 'Manufacture year',
+                    hintText: 'Manufacture year*',
                   ),
                 ),
                 TextField(
                   controller: _kilometersController,
                   decoration: const InputDecoration(
-                    hintText: 'Kilometers',
+                    hintText: 'Kilometers*',
                   ),
                 ),
                 TextField(
                   controller: _fuelTypeController,
                   decoration: const InputDecoration(
-                    hintText: 'Fuel type',
+                    hintText: 'Fuel type*',
                   ),
                 ),
                 TextField(
                   controller: _chassisController,
                   decoration: const InputDecoration(
-                    hintText: 'Chassis type',
+                    hintText: 'Chassis type*',
                   ),
                 ),
                 TextField(
                   controller: _gearboxController,
                   decoration: const InputDecoration(
-                    hintText: 'Gearbox type',
+                    hintText: 'Gearbox type*',
                   ),
                 ),
                 TextField(
                   controller: _engineSizeController,
                   decoration: const InputDecoration(
-                    hintText: 'Engine size',
+                    hintText: 'Engine size*',
                   ),
                 ),
                 TextField(
                   controller: _horsepowerController,
                   decoration: const InputDecoration(
-                    hintText: 'Horsepower',
-                  ),
-                ),
-                TextField(
-                  controller: _priceController,
-                  decoration: const InputDecoration(
-                    hintText: 'Selling for',
+                    hintText: 'Horsepower*',
                   ),
                 ),
                 TextField(
                   controller: _buyPriceController,
                   decoration: const InputDecoration(
-                    hintText: 'Bought for',
+                    hintText: 'Bought for*',
+                  ),
+                ),
+                 TextField(
+                  controller: _priceController,
+                  decoration: const InputDecoration(
+                    hintText: 'Selling for',
                   ),
                 ),
                 TextField(
@@ -147,13 +147,7 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ),
                 TextField(
-                  controller: _soldFor,
-                  decoration: const InputDecoration(
-                    hintText: 'Sold for',
-                  ),
-                ),
-                TextField(
-                  controller: _imagePath,
+                  controller: _imagePathController,
                   decoration: const InputDecoration(
                     hintText: 'Image path',
                   ),
@@ -176,10 +170,21 @@ class _MainPageState extends State<MainPage> {
               int newCarHorsepower = int.parse(_horsepowerController.text);
               int newCarEngineSize = int.parse(_engineSizeController.text);
               double boughtFor = double.parse(_buyPriceController.text);
-              double spentOn = double.parse(_spentController.text);
-              double sellingFor = double.parse(_priceController.text);
-              double soldFor = double.parse(_soldFor.text);
-              String imagePath = _imagePath.text;
+
+              double spentOn = 0;
+              if (_spentController.text.isNotEmpty){
+                spentOn = double.parse(_spentController.text);
+              }
+              
+              double sellingFor = 0;
+              if (_priceController.text.isNotEmpty){
+                sellingFor = double.parse(_priceController.text);
+              }
+              
+              String imagePath = '';
+              if(_imagePathController.text.isNotEmpty){
+                imagePath = _imagePathController.text;
+              }
 
               OwnCar newCar = OwnCar(
                 name: newCarName,
@@ -193,7 +198,6 @@ class _MainPageState extends State<MainPage> {
                 horsepower: newCarHorsepower,
                 buyPrice: boughtFor,
                 spent: spentOn,
-                sellPrice: soldFor,
                 imagePath: imagePath
               );
 
@@ -233,6 +237,7 @@ class _MainPageState extends State<MainPage> {
               _priceController.clear();
               _buyPriceController.clear();
               _spentController.clear();
+              _imagePathController.clear();
             },
             child: const Text('Save'),
           ),
@@ -255,6 +260,7 @@ class _MainPageState extends State<MainPage> {
               _priceController.clear();
               _buyPriceController.clear();
               _spentController.clear();
+              _imagePathController.clear();
             },
             child: const Text('Cancel'),
           ),
@@ -277,62 +283,71 @@ class _MainPageState extends State<MainPage> {
     _priceController.text = ownCar.price.toString();
     _buyPriceController.text = ownCar.buyPrice.toString();
     _spentController.text = ownCar.spent.toString();
-    _soldFor.text = ownCar.sellPrice.toString();
-    _imagePath.text = ownCar.imagePath;
+    _imagePathController.text = ownCar.imagePath;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        title: const Text('Edit car details'),
         content: SafeArea(
           child: SingleChildScrollView(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                const Text('*Required'),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _carNameController,
                   decoration: const InputDecoration(
-                    hintText: 'Car name',
+                    hintText: 'Car name*',
                   ),
                 ),
                 TextField(
                   controller: _carYearController,
                   decoration: const InputDecoration(
-                    hintText: 'Manufacture year',
+                    hintText: 'Manufacture year*',
                   ),
                 ),
                 TextField(
                   controller: _kilometersController,
                   decoration: const InputDecoration(
-                    hintText: 'Kilometers',
+                    hintText: 'Kilometers*',
                   ),
                 ),
                 TextField(
                   controller: _fuelTypeController,
                   decoration: const InputDecoration(
-                    hintText: 'Fuel type',
+                    hintText: 'Fuel type*',
                   ),
                 ),
                 TextField(
                   controller: _chassisController,
                   decoration: const InputDecoration(
-                    hintText: 'Chassis type',
+                    hintText: 'Chassis type*',
                   ),
                 ),
                 TextField(
                   controller: _gearboxController,
                   decoration: const InputDecoration(
-                    hintText: 'Gearbox type',
+                    hintText: 'Gearbox type*',
                   ),
                 ),
                 TextField(
                   controller: _engineSizeController,
                   decoration: const InputDecoration(
-                    hintText: 'Engine size',
+                    hintText: 'Engine size*',
                   ),
                 ),
                 TextField(
                   controller: _horsepowerController,
                   decoration: const InputDecoration(
-                    hintText: 'Horsepower',
+                    hintText: 'Horsepower*',
+                  ),
+                ),
+                TextField(
+                  controller: _buyPriceController,
+                  decoration: const InputDecoration(
+                    hintText: 'Bought for*',
                   ),
                 ),
                 TextField(
@@ -342,25 +357,13 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ),
                 TextField(
-                  controller: _buyPriceController,
-                  decoration: const InputDecoration(
-                    hintText: 'Bought for',
-                  ),
-                ),
-                TextField(
                   controller: _spentController,
                   decoration: const InputDecoration(
                     hintText: 'Money spent on',
                   ),
                 ),
                 TextField(
-                  controller: _soldFor,
-                  decoration: const InputDecoration(
-                    hintText: 'Sold for',
-                  ),
-                ),
-                TextField(
-                  controller: _imagePath,
+                  controller: _imagePathController,
                   decoration: const InputDecoration(
                     hintText: 'Image path',
                   ),
@@ -383,10 +386,21 @@ class _MainPageState extends State<MainPage> {
               int newCarHorsepower = int.parse(_horsepowerController.text);
               int newCarEngineSize = int.parse(_engineSizeController.text);
               double boughtFor = double.parse(_buyPriceController.text);
-              double spentOn = double.parse(_spentController.text);
-              double sellingFor = double.parse(_priceController.text);
-              double soldFor = double.parse(_soldFor.text);
-              String imagePath = _imagePath.text;
+
+              double spentOn = 0;
+              if (_spentController.text.isNotEmpty){
+                spentOn = double.parse(_spentController.text);
+              }
+              
+              double sellingFor = 0;
+              if (_priceController.text.isNotEmpty){
+                sellingFor = double.parse(_priceController.text);
+              }
+              
+              String imagePath = '';
+              if(_imagePathController.text.isNotEmpty){
+                imagePath = _imagePathController.text;
+              }
 
               OwnCar updatedCar = OwnCar(
                 name: newCarName,
@@ -400,7 +414,6 @@ class _MainPageState extends State<MainPage> {
                 horsepower: newCarHorsepower,
                 buyPrice: boughtFor,
                 spent: spentOn,
-                sellPrice: soldFor,
                 imagePath: imagePath
               );
 
@@ -446,6 +459,7 @@ class _MainPageState extends State<MainPage> {
               _priceController.clear();
               _buyPriceController.clear();
               _spentController.clear();
+              _imagePathController.clear();
             },
             child: const Text('Save'),
           ),
@@ -468,6 +482,7 @@ class _MainPageState extends State<MainPage> {
               _priceController.clear();
               _buyPriceController.clear();
               _spentController.clear();
+              _imagePathController.clear();
             },
             child: const Text('Cancel'),
           ),
@@ -579,50 +594,157 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Your Cars',
-                  style: GoogleFonts.dmSerifText(
-                    fontSize: 36,
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                  )),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 80.0),
-                  child: ListView.builder(
-                    itemCount: _myOwnCars.length,
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) {
-                      OwnCar ownCar = _myOwnCars[index];
+  child: SingleChildScrollView(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 10),
+          child: Text(
+            'Your Cars',
+            style: GoogleFonts.dmSerifText(
+              fontSize: 36,
+              color: Theme.of(context).colorScheme.inversePrimary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
 
-                      return OwnCarTile(
-                        ownCar: ownCar,
-                        editCar: (context) {
-                          editCarBox(ownCar);
-                        },
-                        deleteCar: (context) {
-                          deleteCarBox(ownCar);
-                        },
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OwnCarDetailsPage(ownCar: ownCar),
-                            ),
-                          );
-                        },
-                        onButtonTap: () {
-                          // Additional button tap action if needed
-                        },
-                      );
-                    },
-                  ),
+        // Active Cars Section
+        if (_myOwnCars.isEmpty)
+          Center(
+            child: Text(
+              'No active cars yet...',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.dmSerifText(
+                fontSize: 24,
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
+            ),
+          )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _myOwnCars.length,
+              itemBuilder: (context, index) {
+                OwnCar ownCar = _myOwnCars[index];
+                return OwnCarTile(
+                  ownCar: ownCar,
+                  editCar: (context) {
+                    editCarBox(ownCar);
+                  },
+                  deleteCar: (context) {
+                    deleteCarBox(ownCar);
+                  },
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OwnCarDetailsPage(ownCar: ownCar),
+                      ),
+                    );
+                  },
+                  onButtonTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Sold car?'),
+                        content: TextField(
+                          controller: _soldForController,
+                          decoration: const InputDecoration(
+                            hintText: 'Sold for',
+                          ),
+                        ),
+                        actions: [
+                          // confirm button
+                          MaterialButton(
+                            onPressed: () async {
+
+                              _soldForController.clear();
+                              // pop box
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Confirm'),
+                          ),
+
+                          // cancel button
+                          MaterialButton(
+                            onPressed: () {
+                              _soldForController.clear();
+                              // pop box
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                        ],
+                      )
+                    );
+                  },
+                );
+              },
+            ),
+
+            const SizedBox(height: 20),
+
+            // Sold Cars Section
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Text(
+                'Sold Cars',
+                style: GoogleFonts.dmSerifText(
+                  fontSize: 36,
+                  color: Theme.of(context).colorScheme.inversePrimary,
                 ),
               ),
+            ),
+            const SizedBox(height: 10),
+
+            if (_mySoldCars.isEmpty)
+              Center(
+                child: Text(
+                  'No sold cars yet...',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.dmSerifText(
+                    fontSize: 24,
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  ),
+                ),
+              )
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _mySoldCars.length,
+                  itemBuilder: (context, index) {
+                    OwnCar soldCar = _mySoldCars[index];
+                    return OwnCarTile(
+                      ownCar: soldCar,
+                      editCar: (context) {
+                        // Sold cars may not be editable
+                      },
+                      deleteCar: (context) {
+                        // Sold cars may not be deletable
+                      },
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OwnCarDetailsPage(ownCar: soldCar),
+                          ),
+                        );
+                      },
+                      onButtonTap: () {
+                        // Additional button tap action if needed
+                      },
+                    );
+                  },
+                ),
+              const SizedBox(height: 20),
             ],
           ),
-      ));
+        ),
+      )
+    );
   }
 }

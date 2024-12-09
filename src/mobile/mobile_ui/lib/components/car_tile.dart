@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mobile_ui/models/car.dart';
 
 class CarTile extends StatelessWidget {
   final Car car;
   final void Function() onTap;
-  final void Function()? onButtonTap;
 
   const CarTile({
     super.key,
     required this.car,
     required this.onTap,
-    required this.onButtonTap,
   });
 
   @override
@@ -110,25 +107,6 @@ class CarTile extends StatelessWidget {
                           ),
                         ),
                       ],
-                    ),
-
-                    // Button to edit car details
-                    GestureDetector(
-                      onTap: onButtonTap,
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: const BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.tune,
-                          color: Colors.white,
-                        ),
-                      ),
                     ),
                   ],
                 ),

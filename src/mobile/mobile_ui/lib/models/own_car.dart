@@ -20,15 +20,15 @@ class OwnCar {
     required this.fuelType,
     required this.kilometers,
     required this.year,
-    required this.price,
+    this.price = 0,
     required this.chassis,
     required this.gearbox,
     required this.engineSize,
     required this.horsepower,
     required this.buyPrice,
-    required this.spent,
-    required this.sellPrice,
-    required this.imagePath,
+    this.spent = 0,
+    this.sellPrice = 0,
+    this.imagePath = '',
   });
 
   factory OwnCar.fromJson(Map<String, dynamic> json) {
