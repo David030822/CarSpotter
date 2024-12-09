@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_ui/components/my_drawer.dart';
 import 'package:mobile_ui/components/own_car_tile.dart';
+import 'package:mobile_ui/components/sold_car_tile.dart';
 import 'package:mobile_ui/models/own_car.dart';
 import 'package:mobile_ui/pages/chatbot_page.dart';
 import 'package:mobile_ui/pages/own_car_details_page.dart';
@@ -761,10 +762,8 @@ class _MainPageState extends State<MainPage> {
                     itemCount: _mySoldCars.length,
                     itemBuilder: (context, index) {
                       OwnCar soldCar = _mySoldCars[index];
-                      return OwnCarTile(
+                      return SoldCarTile(
                         ownCar: soldCar,
-                        editCar: (context) {},
-                        deleteCar: (context) {},
                         onTap: () {
                           Navigator.push(
                             context,
@@ -774,7 +773,6 @@ class _MainPageState extends State<MainPage> {
                             ),
                           );
                         },
-                        onButtonTap: () {},
                       );
                     },
                   ),
@@ -782,6 +780,7 @@ class _MainPageState extends State<MainPage> {
               ],
             ),
           ),
-        ));
+        )
+      );
   }
 }

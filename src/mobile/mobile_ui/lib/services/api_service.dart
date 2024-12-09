@@ -13,7 +13,7 @@ import 'package:mobile_ui/models/user.dart';
 
 class ApiService {
   //static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";  //Lori
-  static const String baseUrl = "https://679e-86-123-132-171.ngrok-free.app";
+  static const String baseUrl = "https://ed11-86-123-132-171.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
