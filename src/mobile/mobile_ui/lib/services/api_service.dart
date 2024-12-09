@@ -3,9 +3,7 @@ import 'dart:io';
 import 'package:mobile_ui/models/monthly_sales.dart';
 import 'package:mobile_ui/models/own_car.dart';
 import 'package:mobile_ui/models/weekly_sales.dart';
-import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_ui/services/auth_service.dart';
 import 'package:mobile_ui/models/dealer.dart';
@@ -16,8 +14,8 @@ import 'package:mobile_ui/models/user.dart';
 // uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 class ApiService {
-  //static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";  //Lori
-  static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";
+  static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";  //Lori
+  //static const String baseUrl = "https://f1c7-86-123-132-171.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
@@ -37,9 +35,8 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      final List<dynamic> carsJson = jsonResponse['cars'];
-      return carsJson.map((json) => Car.fromJson(json)).toList();
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => Car.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cars: ${response.body}');
     }
@@ -474,7 +471,8 @@ class ApiService {
           'Failed to check following status: ${response.statusCode}');
     }
   }
-    static Future<List<Car>> getSoldCarsByDealerId(int dealerId) async {
+
+  static Future<List<Car>> getSoldCarsByDealerId(int dealerId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/sold_cars/$dealerId'),
     );

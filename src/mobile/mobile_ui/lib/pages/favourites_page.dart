@@ -77,7 +77,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
                       } else if (snapshot.hasError) {
                         return Center(
                           child: Text(
-                            'Failed to load cars for ${dealer.name}',
+                            'Failed to load cars for ${dealer.name} - $snapshot',
                             style: const TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
