@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_ui/components/my_button.dart';
 import 'package:mobile_ui/components/my_text_field.dart';
-import 'package:mobile_ui/components/square_tile.dart';
-import 'package:mobile_ui/pages/forgot_password_page.dart';
-import 'package:mobile_ui/pages/google_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/register_page.dart';
 import 'package:mobile_ui/services/api_service.dart';

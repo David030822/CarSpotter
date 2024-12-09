@@ -16,6 +16,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  // ignore: unused_field
   bool _isLoading = false;
   List<OwnCar> _myOwnCars = [];
   List<OwnCar> _mySoldCars = [];
@@ -762,12 +763,8 @@ class _MainPageState extends State<MainPage> {
                       OwnCar soldCar = _mySoldCars[index];
                       return OwnCarTile(
                         ownCar: soldCar,
-                        editCar: (context) {
-                          editCarBox(soldCar);
-                        },
-                        deleteCar: (context) {
-                          deleteCarBox(soldCar);
-                        },
+                        editCar: (context) {},
+                        deleteCar: (context) {},
                         onTap: () {
                           Navigator.push(
                             context,

@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:mobile_ui/models/own_car.dart';
-import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_ui/services/auth_service.dart';
 import 'package:mobile_ui/models/dealer.dart';
@@ -15,7 +13,7 @@ import 'package:mobile_ui/models/user.dart';
 
 class ApiService {
   //static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";  //Lori
-  static const String baseUrl = "https://f1c7-86-123-132-171.ngrok-free.app";
+  static const String baseUrl = "https://679e-86-123-132-171.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(

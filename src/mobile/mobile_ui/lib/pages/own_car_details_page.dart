@@ -4,6 +4,7 @@ import 'package:mobile_ui/components/custom_button.dart';
 import 'package:mobile_ui/models/own_car.dart';
 import 'package:mobile_ui/pages/notes_page.dart';
 
+// ignore: must_be_immutable
 class OwnCarDetailsPage extends StatelessWidget {
   OwnCar ownCar;
   OwnCarDetailsPage({super.key, required this.ownCar});

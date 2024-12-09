@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mobile_ui/models/own_car.dart';
 
+// ignore: must_be_immutable
 class OwnCarTile extends StatelessWidget {
   OwnCar ownCar;
   final void Function(BuildContext)? editCar;

@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_ui/components/custom_button.dart';
 import 'package:mobile_ui/components/friend_tile.dart';
 import 'package:mobile_ui/components/my_text_field.dart';
-import 'package:mobile_ui/constants.dart';
 import 'package:mobile_ui/models/user.dart';
 import 'package:mobile_ui/services/api_service.dart';
 import 'package:mobile_ui/services/auth_service.dart';
