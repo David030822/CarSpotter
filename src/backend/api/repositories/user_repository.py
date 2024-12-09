@@ -153,3 +153,10 @@ def is_followed(user_id: int, followed_id: int, db: Session) -> bool:
     if result:
         return True
     return False
+
+def sell_own_car(own_car_id: int, sell_for: float, db: Session):
+    car = get_own_car_by_id(db, own_car_id).first()
+    car.sold_for = sell_for
+    db.commit()
+    db.refresh(car)
+    return car

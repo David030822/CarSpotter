@@ -28,3 +28,7 @@ class NewOwnCarRequest(BaseModel):
     sold_for: float
     spent_on: float 
     img_url: str
+
+class SellOwnCarRequest(BaseModel):
+    own_car_id: int
+    sell_for: float

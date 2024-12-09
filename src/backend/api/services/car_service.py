@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 from api.repositories.dealer_car_repository import add_car, add_dealer, add_sold_car
-from scraper.scripts import scrape_dealer_inventory 
+from scraper.scripts.scrape_dealer_inventory import scrape_dealer_inventory
 from db.tables.models import Car, Dealer, SoldCar
 from sqlalchemy.sql import func
 
 def insert_cars_and_dealer_by_dealer_name(db: Session, dealer_name: str):
-    scraped_data = scrape_dealer_inventory.scrape_dealer_inventory(dealer_name)
+    scraped_data = scrape_dealer_inventory(dealer_name)
     if type(scraped_data) == dict:
         raise ValueError(f"Error while scraping data: {scraped_data}")
     

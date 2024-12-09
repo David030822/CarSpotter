@@ -8,12 +8,14 @@ import 'package:mobile_ui/pages/statistics_page.dart';
 
 class DealerCarsPage extends StatefulWidget {
   final List<Car> cars;
+  final List<Car> soldCars;
   final String name;
-  
+
   const DealerCarsPage({
     super.key,
     required this.cars,
     required this.name,
+    required this.soldCars
   });
 
   @override
@@ -21,7 +23,6 @@ class DealerCarsPage extends StatefulWidget {
 }
 
 class _DealerCarsPageState extends State<DealerCarsPage> {
-  List<Car> soldCars = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,9 +48,7 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 10),
-
               if (widget.cars.isEmpty)
                 Center(
                   child: Text(
@@ -64,7 +63,8 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
               else
                 ListView.builder(
                   shrinkWrap: true, // Constrain height
-                  physics: const NeverScrollableScrollPhysics(), // Prevent nested scrolling
+                  physics:
+                      const NeverScrollableScrollPhysics(), // Prevent nested scrolling
                   itemCount: widget.cars.length,
                   itemBuilder: (context, index) {
                     return CarTile(
@@ -81,9 +81,7 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
                     );
                   },
                 ),
-
               const SizedBox(height: 20),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
@@ -95,7 +93,7 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              if (soldCars.isEmpty)
+              if (widget.soldCars.isEmpty)
                 Center(
                   child: Text(
                     'No sold cars yet...',
@@ -110,25 +108,23 @@ class _DealerCarsPageState extends State<DealerCarsPage> {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: soldCars.length,
+                  itemCount: widget.soldCars.length,
                   itemBuilder: (context, index) {
                     return CarTile(
-                      car: soldCars[index],
+                      car: widget.soldCars[index],
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                CarDetailsPage(car: soldCars[index]),
+                                CarDetailsPage(car: widget.soldCars[index]),
                           ),
                         );
                       },
                     );
                   },
                 ),
-
               const SizedBox(height: 20),
-
               Center(
                 child: CustomButton(
                   color: Colors.black,

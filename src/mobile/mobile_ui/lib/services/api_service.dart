@@ -484,4 +484,37 @@ class ApiService {
       throw Exception('Failed to load cars: ${response.body}');
     }
   }
+
+  static Future<List<OwnCar>> getOwnSoldCars(int userId) async {
+    final response = await http.get(Uri.parse('$baseUrl/sold_owncars/$userId'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> carList = jsonDecode(response.body);
+      return carList.map((json) => OwnCar.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load cars: ${response.body}');
+    }
+  }
+
+  static Future<void> sellOwnCar(int userId, int ownCarId, double sellFor) async {
+    final url = Uri.parse('$baseUrl/sell_owncar/$userId');
+    final body = json.encode({
+      'own_car_id': ownCarId,
+      'sell_for': sellFor,
+    });
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      print('Car sold successfully.');
+    } else {
+      throw Exception('Failed to sell car: ${response.body}');
+    }
+  }
 }

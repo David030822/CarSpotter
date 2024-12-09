@@ -9,17 +9,19 @@ from api.services.user_service import (
     get_favourites_service,
     get_following_service,
     get_sold_cars_by_dealer_id_service,
+    get_sold_own_cars_by_user_id_service,
     is_followed_service,
     remove_favourite_service,
     get_own_cars_service,
     get_user_data_service,
+    sell_own_car_service,
     update_user_data_service,
     update_user_image_service,
     add_own_car_service,
     add_following_service
 )
 from api.models.response_models import CarResponse, OwnCarResponse, UserDataResponse
-from api.models.request_models import UserUpdate, NewOwnCarRequest
+from api.models.request_models import SellOwnCarRequest, UserUpdate, NewOwnCarRequest
 from api.repositories.save_file import save_file
 
 user_router = APIRouter()
@@ -97,9 +99,16 @@ def is_following(user_id: int, following_id: int, db: Session = Depends(get_db))
     return is_followed_service(user_id, following_id, db)
 
 @user_router.get("/sold_cars/{dealer_id}", response_model=List[CarResponse])
-def get_sold_cars_by_user_id(dealer_id: int, db: Session = Depends(get_db)):
+def get_sold_cars_by_dealer_id(dealer_id: int, db: Session = Depends(get_db)):
     return get_sold_cars_by_dealer_id_service(dealer_id, db)
 
+@user_router.get("/sold_owncars/{user_id}", response_model=List[OwnCarResponse])
+def get_sold_own_cars_by_user_id(user_id: int, db: Session = Depends(get_db)):
+    return get_sold_own_cars_by_user_id_service(user_id, db)
+
+@user_router.put("/sell_owncar/{user_id}")
+def sell_own_car(user_id: int, request: SellOwnCarRequest, db: Session = Depends(get_db)):
+    return sell_own_car_service(user_id, request.own_car_id, request.sell_for, db)
 
 @user_router.get("/search_users", response_model=List[UserDataResponse])
 def search_users(
