@@ -87,16 +87,6 @@ class OwnCarDetailsPage extends StatelessWidget {
                 const SizedBox(height: 15),
           
                 Text(
-                  "Price: ${ownCar.price.toString()}",
-                  style: GoogleFonts.dmSerifText(
-                    fontSize: 18,
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                  )
-                ),
-          
-                const SizedBox(height: 15),
-          
-                Text(
                   "Chassis type: ${ownCar.chassis}",
                   style: GoogleFonts.dmSerifText(
                     fontSize: 18,
@@ -154,6 +144,16 @@ class OwnCarDetailsPage extends StatelessWidget {
                   )
                 ),
           
+                const SizedBox(height: 15),
+
+                Text(
+                  "Selling for: ${ownCar.price.toString()}",
+                  style: GoogleFonts.dmSerifText(
+                    fontSize: 18,
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  )
+                ),
+
                 const SizedBox(height: 15),
           
                 Text(

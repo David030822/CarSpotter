@@ -20,6 +20,7 @@ class _SearchPageState extends State<SearchPage> {
   final _searchController = TextEditingController();
   bool _isLoading = false;
   List<Car> _dealerCars = [];
+  List<Car> _dealerSoldCars = [];
   Dealer? _dealer;
   List<Dealer> favoriteDealers = [];
 
@@ -48,6 +49,7 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       _isLoading = true;
       _dealerCars = [];
+      _dealerSoldCars = [];
       _dealer = null;
       loadFavorites();
     });
@@ -69,10 +71,14 @@ class _SearchPageState extends State<SearchPage> {
           }
         }
       }
+      final dealerSoldCars = await ApiService.getSoldCarsByDealerId(_dealer!.id);
 
-      _dealerCars = carsJson.map<Car>((json) => Car.fromJson(json)).toList();
+      final dealerCars = carsJson.map<Car>((json) => Car.fromJson(json)).toList();
 
-      setState(() {});
+    setState(() {
+      _dealerCars = dealerCars;
+      _dealerSoldCars = dealerSoldCars;
+    });
 
       if (_dealerCars.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -156,6 +162,7 @@ class _SearchPageState extends State<SearchPage> {
                           MaterialPageRoute(
                             builder: (context) => DealerCarsPage(
                               cars: _dealerCars,
+                              soldCars: _dealerSoldCars,
                               name: dealer.name,
                             ),
                           ),

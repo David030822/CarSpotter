@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 from api.repositories.dealer_car_repository import add_car, add_dealer, add_sold_car
-from scraper.scripts import scrape_dealer_inventory 
+from scraper.scripts.scrape_dealer_inventory import scrape_dealer_inventory
 from db.tables.models import Car, Dealer, SoldCar
 from sqlalchemy.sql import func
 
 def insert_cars_and_dealer_by_dealer_name(db: Session, dealer_name: str):
-    scraped_data = scrape_dealer_inventory.scrape_dealer_inventory(dealer_name)
+    scraped_data = scrape_dealer_inventory(dealer_name)
     if type(scraped_data) == dict:
         raise ValueError(f"Error while scraping data: {scraped_data}")
     
@@ -108,24 +108,4 @@ def get_cars_by_dealer_id(db: Session, dealer_id: int):
     
     sold_car_ids = [soldCar.car_id for soldCar in db.query(SoldCar)]
     cars = [car for car in cars if car.id not in sold_car_ids]
-
-    return {
-        "cars": [
-            {
-                "id": car.id,
-                "model": car.model,
-                "km": car.km,
-                "year": car.year,
-                "price": car.price,
-                "combustible": car.combustible,
-                "gearbox": car.gearbox,
-                "body_type": car.body_type,
-                "cylinder_capacity": car.cylinder_capacity,
-                "power": car.power,
-                "dateof_post": car.dateof_post,
-                "id_post": car.id_post,
-                "img_url": car.img_url,
-            }
-            for car in cars
-        ]
-    }
+    return cars

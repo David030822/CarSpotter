@@ -61,5 +61,4 @@ def get_user_data_service(user_id: int, db: Session):
     user = get_user_by_id(db, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
     return user

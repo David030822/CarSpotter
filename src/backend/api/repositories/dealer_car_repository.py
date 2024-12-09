@@ -78,3 +78,7 @@ def add_sold_car(db: Session, car_id: int, sold_price: float):
 def add_own_car(db: Session, own_car: OwnCar):
     db.add(own_car)
     db.commit()
+
+
+def get_dealer_by_dealer_id(db: Session, dealer_id: int):
+    return db.query(Dealer).filter(Dealer.id == dealer_id).first()

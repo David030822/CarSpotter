@@ -258,6 +258,7 @@ class _FriendPageState extends State<FriendPage> {
                                 builder: (context) => DealerCarsPage(
                                   cars: cars,
                                   name: dealer.name,
+                                  soldCars: [],
                                 ),
                               ),
                             );

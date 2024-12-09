@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from db.tables.models import Followers, User,Favourite, OwnCar, Dealer
+from db.tables.models import Car, Followers, SoldCar, User,Favourite, OwnCar, Dealer
 from api.models.request_models import UserUpdate,NewOwnCarRequest
 from datetime import datetime
 
@@ -140,10 +140,23 @@ def delete_following(user_id: int, following_id: int, db: Session):
     db.commit()
     return following  
 
-
+def get_sold_cars_by_dealer_id(dealer_id: int, db: Session):
+    return (
+        db.query(Car)
+        .join(SoldCar, SoldCar.car_id == Car.id)
+        .filter(Car.dealer_id == dealer_id)
+        .all()
+    )
 
 def is_followed(user_id: int, followed_id: int, db: Session) -> bool:
     result = db.query(Followers).filter(Followers.follower_id == user_id, Followers.following_id == followed_id).first()
     if result:
         return True
     return False
+
+def sell_own_car(own_car_id: int, sell_for: float, db: Session):
+    car = get_own_car_by_id(db, own_car_id).first()
+    car.sold_for = sell_for
+    db.commit()
+    db.refresh(car)
+    return car

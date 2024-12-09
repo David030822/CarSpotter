@@ -35,9 +35,8 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      final List<dynamic> carsJson = jsonResponse['cars'];
-      return carsJson.map((json) => Car.fromJson(json)).toList();
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => Car.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cars: ${response.body}');
     }
@@ -60,13 +59,14 @@ class ApiService {
     }
   }
 
-  static Future<int?> getCarIdFromResponse(Map<String, dynamic> response) async {
+  static Future<int?> getCarIdFromResponse(
+      Map<String, dynamic> response) async {
     if (response.isEmpty) {
       return null; // Return null if the response is empty
     }
 
     // Extract the car ID from the response payload
-    int? carId = response['id']; 
+    int? carId = response['id'];
 
     return carId;
   }
@@ -298,7 +298,8 @@ class ApiService {
     }
   }
 
-  static Future<void> editOwnCar(int userId, int carId, OwnCar updatedCar) async {
+  static Future<void> editOwnCar(
+      int userId, int carId, OwnCar updatedCar) async {
     final url = Uri.parse('$baseUrl/user/$userId/owncar/$carId');
     final token = await AuthService.getToken();
 
@@ -362,7 +363,7 @@ class ApiService {
     final token = await AuthService.getToken();
 
     if (token == null) {
-        throw Exception("User is not authenticated");
+      throw Exception("User is not authenticated");
     }
     final headers = {
       'Content-Type': 'application/json',
@@ -421,7 +422,8 @@ class ApiService {
       final List<dynamic> jsonList = json.decode(response.body);
       return jsonList.map((json) => User.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to fetch following users: ${response.statusCode}');
+      throw Exception(
+          'Failed to fetch following users: ${response.statusCode}');
     }
   }
 
@@ -446,28 +448,73 @@ class ApiService {
     }
   }
 
-static Future<bool> isFollowing(int userId, int targetUserId) async {
-  final url = Uri.parse('$baseUrl/following/$userId/$targetUserId');
-  final token = await AuthService.getToken();
+  static Future<bool> isFollowing(int userId, int targetUserId) async {
+    final url = Uri.parse('$baseUrl/following/$userId/$targetUserId');
+    final token = await AuthService.getToken();
 
-  if (token == null) {
-    throw Exception("User is not logged in");
+    if (token == null) {
+      throw Exception("User is not logged in");
+    }
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      return response.body == 'true';
+    } else {
+      throw Exception(
+          'Failed to check following status: ${response.statusCode}');
+    }
   }
 
-  final headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': 'Bearer $token',
-  };
+  static Future<List<Car>> getSoldCarsByDealerId(int dealerId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/sold_cars/$dealerId'),
+    );
 
-  final response = await http.get(url, headers: headers);
-
-  if (response.statusCode == 200) {
-    return response.body == 'true';
-  } else {
-    throw Exception('Failed to check following status: ${response.statusCode}');
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => Car.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load cars: ${response.body}');
+    }
   }
-}
 
+  static Future<List<OwnCar>> getOwnSoldCars(int userId) async {
+    final response = await http.get(Uri.parse('$baseUrl/sold_owncars/$userId'));
 
+    if (response.statusCode == 200) {
+      final List<dynamic> carList = jsonDecode(response.body);
+      return carList.map((json) => OwnCar.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load cars: ${response.body}');
+    }
+  }
+
+  static Future<void> sellOwnCar(int userId, int ownCarId, double sellFor) async {
+    final url = Uri.parse('$baseUrl/sell_owncar/$userId');
+    final body = json.encode({
+      'own_car_id': ownCarId,
+      'sell_for': sellFor,
+    });
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      print('Car sold successfully.');
+    } else {
+      throw Exception('Failed to sell car: ${response.body}');
+    }
+  }
 }

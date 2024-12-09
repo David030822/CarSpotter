@@ -18,6 +18,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   bool _isLoading = false;
   List<OwnCar> _myOwnCars = [];
+  List<OwnCar> _mySoldCars = [];
 
   // text editing controllers
   final TextEditingController _carNameController = TextEditingController();
@@ -31,8 +32,8 @@ class _MainPageState extends State<MainPage> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _buyPriceController = TextEditingController();
   final TextEditingController _spentController = TextEditingController();
-  final TextEditingController _soldFor = TextEditingController();
-  final TextEditingController _imagePath = TextEditingController();
+  final TextEditingController _soldForController = TextEditingController();
+  final TextEditingController _imagePathController = TextEditingController();
 
   void initState() {
     super.initState();
@@ -43,6 +44,7 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       _isLoading = true;
       _myOwnCars = [];
+      _mySoldCars = [];
     });
 
     try {
@@ -56,6 +58,7 @@ class _MainPageState extends State<MainPage> {
       }
       _myOwnCars = await ApiService.getOwnCars(userId);
 
+      _mySoldCars = await ApiService.getOwnSoldCars(userId);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
@@ -67,61 +70,107 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  void sellCar(OwnCar ownCar) async {
+    double soldPrice = double.parse(_soldForController.text);
+
+    if (soldPrice == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sale canceled: Price cannot be 0')),
+      );
+      return; // Do not proceed with the sale
+    }
+
+    try {
+      final token = await AuthService.getToken();
+      if (token == null) {
+        throw Exception("User is not authenticated");
+      }
+
+      final userId = await AuthService.getUserIdFromToken(token);
+      if (userId == null) {
+        throw Exception("Invalid user ID");
+      }
+
+      await ApiService.sellOwnCar(userId, ownCar.id!, soldPrice);
+
+      // After sale, reload the car list
+      loadOwnCars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Car sold successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+
+    _soldForController.clear();
+  }
+
   // add new own car
   void addNewOwnCar() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        title: const Text('Enter new car details'),
         content: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
+                const Text('*Required'),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _carNameController,
                   decoration: const InputDecoration(
-                    hintText: 'Car name',
+                    hintText: 'Car name*',
                   ),
                 ),
                 TextField(
                   controller: _carYearController,
                   decoration: const InputDecoration(
-                    hintText: 'Manufacture year',
+                    hintText: 'Manufacture year*',
                   ),
                 ),
                 TextField(
                   controller: _kilometersController,
                   decoration: const InputDecoration(
-                    hintText: 'Kilometers',
+                    hintText: 'Kilometers*',
                   ),
                 ),
                 TextField(
                   controller: _fuelTypeController,
                   decoration: const InputDecoration(
-                    hintText: 'Fuel type',
+                    hintText: 'Fuel type*',
                   ),
                 ),
                 TextField(
                   controller: _chassisController,
                   decoration: const InputDecoration(
-                    hintText: 'Chassis type',
+                    hintText: 'Chassis type*',
                   ),
                 ),
                 TextField(
                   controller: _gearboxController,
                   decoration: const InputDecoration(
-                    hintText: 'Gearbox type',
+                    hintText: 'Gearbox type*',
                   ),
                 ),
                 TextField(
                   controller: _engineSizeController,
                   decoration: const InputDecoration(
-                    hintText: 'Engine size',
+                    hintText: 'Engine size*',
                   ),
                 ),
                 TextField(
                   controller: _horsepowerController,
                   decoration: const InputDecoration(
-                    hintText: 'Horsepower',
+                    hintText: 'Horsepower*',
+                  ),
+                ),
+                TextField(
+                  controller: _buyPriceController,
+                  decoration: const InputDecoration(
+                    hintText: 'Bought for*',
                   ),
                 ),
                 TextField(
@@ -131,25 +180,13 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ),
                 TextField(
-                  controller: _buyPriceController,
-                  decoration: const InputDecoration(
-                    hintText: 'Bought for',
-                  ),
-                ),
-                TextField(
                   controller: _spentController,
                   decoration: const InputDecoration(
                     hintText: 'Money spent on',
                   ),
                 ),
                 TextField(
-                  controller: _soldFor,
-                  decoration: const InputDecoration(
-                    hintText: 'Sold for',
-                  ),
-                ),
-                TextField(
-                  controller: _imagePath,
+                  controller: _imagePathController,
                   decoration: const InputDecoration(
                     hintText: 'Image path',
                   ),
@@ -172,26 +209,35 @@ class _MainPageState extends State<MainPage> {
               int newCarHorsepower = int.parse(_horsepowerController.text);
               int newCarEngineSize = int.parse(_engineSizeController.text);
               double boughtFor = double.parse(_buyPriceController.text);
-              double spentOn = double.parse(_spentController.text);
-              double sellingFor = double.parse(_priceController.text);
-              double soldFor = double.parse(_soldFor.text);
-              String imagePath = _imagePath.text;
+
+              double spentOn = 0;
+              if (_spentController.text.isNotEmpty) {
+                spentOn = double.parse(_spentController.text);
+              }
+
+              double sellingFor = 0;
+              if (_priceController.text.isNotEmpty) {
+                sellingFor = double.parse(_priceController.text);
+              }
+
+              String imagePath = '';
+              if (_imagePathController.text.isNotEmpty) {
+                imagePath = _imagePathController.text;
+              }
 
               OwnCar newCar = OwnCar(
-                name: newCarName,
-                fuelType: newCarFuelType,
-                kilometers: newCarKilometers,
-                year: newCarYear,
-                price: sellingFor,
-                chassis: newCarChassis,
-                gearbox: newCarGearbox,
-                engineSize: newCarEngineSize,
-                horsepower: newCarHorsepower,
-                buyPrice: boughtFor,
-                spent: spentOn,
-                sellPrice: soldFor,
-                imagePath: imagePath
-              );
+                  name: newCarName,
+                  fuelType: newCarFuelType,
+                  kilometers: newCarKilometers,
+                  year: newCarYear,
+                  price: sellingFor,
+                  chassis: newCarChassis,
+                  gearbox: newCarGearbox,
+                  engineSize: newCarEngineSize,
+                  horsepower: newCarHorsepower,
+                  buyPrice: boughtFor,
+                  spent: spentOn,
+                  imagePath: imagePath);
 
               try {
                 final token = await AuthService.getToken();
@@ -229,6 +275,7 @@ class _MainPageState extends State<MainPage> {
               _priceController.clear();
               _buyPriceController.clear();
               _spentController.clear();
+              _imagePathController.clear();
             },
             child: const Text('Save'),
           ),
@@ -251,6 +298,7 @@ class _MainPageState extends State<MainPage> {
               _priceController.clear();
               _buyPriceController.clear();
               _spentController.clear();
+              _imagePathController.clear();
             },
             child: const Text('Cancel'),
           ),
@@ -267,274 +315,287 @@ class _MainPageState extends State<MainPage> {
     _kilometersController.text = ownCar.kilometers.toString();
     _fuelTypeController.text = ownCar.fuelType;
     _chassisController.text = ownCar.chassis;
-    _gearboxController.text = ownCar.gearbox; 
+    _gearboxController.text = ownCar.gearbox;
     _engineSizeController.text = ownCar.engineSize.toString();
     _horsepowerController.text = ownCar.horsepower.toString();
     _priceController.text = ownCar.price.toString();
     _buyPriceController.text = ownCar.buyPrice.toString();
     _spentController.text = ownCar.spent.toString();
-    _soldFor.text = ownCar.sellPrice.toString();
-    _imagePath.text = ownCar.imagePath;
+    _imagePathController.text = ownCar.imagePath;
 
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: _carNameController,
-                  decoration: const InputDecoration(
-                    hintText: 'Car name',
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Edit car details'),
+              content: SafeArea(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text('*Required'),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _carNameController,
+                        decoration: const InputDecoration(
+                          hintText: 'Car name*',
+                        ),
+                      ),
+                      TextField(
+                        controller: _carYearController,
+                        decoration: const InputDecoration(
+                          hintText: 'Manufacture year*',
+                        ),
+                      ),
+                      TextField(
+                        controller: _kilometersController,
+                        decoration: const InputDecoration(
+                          hintText: 'Kilometers*',
+                        ),
+                      ),
+                      TextField(
+                        controller: _fuelTypeController,
+                        decoration: const InputDecoration(
+                          hintText: 'Fuel type*',
+                        ),
+                      ),
+                      TextField(
+                        controller: _chassisController,
+                        decoration: const InputDecoration(
+                          hintText: 'Chassis type*',
+                        ),
+                      ),
+                      TextField(
+                        controller: _gearboxController,
+                        decoration: const InputDecoration(
+                          hintText: 'Gearbox type*',
+                        ),
+                      ),
+                      TextField(
+                        controller: _engineSizeController,
+                        decoration: const InputDecoration(
+                          hintText: 'Engine size*',
+                        ),
+                      ),
+                      TextField(
+                        controller: _horsepowerController,
+                        decoration: const InputDecoration(
+                          hintText: 'Horsepower*',
+                        ),
+                      ),
+                      TextField(
+                        controller: _buyPriceController,
+                        decoration: const InputDecoration(
+                          hintText: 'Bought for*',
+                        ),
+                      ),
+                      TextField(
+                        controller: _priceController,
+                        decoration: const InputDecoration(
+                          hintText: 'Selling for',
+                        ),
+                      ),
+                      TextField(
+                        controller: _spentController,
+                        decoration: const InputDecoration(
+                          hintText: 'Money spent on',
+                        ),
+                      ),
+                      TextField(
+                        controller: _imagePathController,
+                        decoration: const InputDecoration(
+                          hintText: 'Image path',
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                TextField(
-                  controller: _carYearController,
-                  decoration: const InputDecoration(
-                    hintText: 'Manufacture year',
-                  ),
+              ),
+              actions: [
+                // save button
+                MaterialButton(
+                  onPressed: () async {
+                    // get the new car data
+                    String newCarName = _carNameController.text;
+                    int newCarYear = int.parse(_carYearController.text);
+                    int newCarKilometers =
+                        int.parse(_kilometersController.text);
+                    String newCarChassis = _chassisController.text;
+                    String newCarGearbox = _gearboxController.text;
+                    String newCarFuelType = _fuelTypeController.text;
+                    int newCarHorsepower =
+                        int.parse(_horsepowerController.text);
+                    int newCarEngineSize =
+                        int.parse(_engineSizeController.text);
+                    double boughtFor = double.parse(_buyPriceController.text);
+
+                    double spentOn = 0;
+                    if (_spentController.text.isNotEmpty) {
+                      spentOn = double.parse(_spentController.text);
+                    }
+
+                    double sellingFor = 0;
+                    if (_priceController.text.isNotEmpty) {
+                      sellingFor = double.parse(_priceController.text);
+                    }
+
+                    String imagePath = '';
+                    if (_imagePathController.text.isNotEmpty) {
+                      imagePath = _imagePathController.text;
+                    }
+
+                    OwnCar updatedCar = OwnCar(
+                        name: newCarName,
+                        fuelType: newCarFuelType,
+                        kilometers: newCarKilometers,
+                        year: newCarYear,
+                        price: sellingFor,
+                        chassis: newCarChassis,
+                        gearbox: newCarGearbox,
+                        engineSize: newCarEngineSize,
+                        horsepower: newCarHorsepower,
+                        buyPrice: boughtFor,
+                        spent: spentOn,
+                        imagePath: imagePath);
+
+                    try {
+                      final token = await AuthService.getToken();
+                      if (token == null) {
+                        throw Exception("User is not authenticated");
+                      }
+
+                      final userId =
+                          await AuthService.getUserIdFromToken(token);
+                      if (userId == null) {
+                        throw Exception("Invalid user ID");
+                      }
+
+                      // Validate car ID
+                      if (ownCar.id == null) {
+                        throw Exception("Invalid car ID");
+                      }
+
+                      // Call the API service to add the new car
+                      await ApiService.editOwnCar(
+                          userId, ownCar.id!, updatedCar);
+
+                      // Reload cars after adding a new one
+                      loadOwnCars();
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${e.toString()}')),
+                      );
+                    }
+
+                    // Pop box
+                    Navigator.pop(context);
+
+                    // Clear controllers
+                    _carNameController.clear();
+                    _carYearController.clear();
+                    _kilometersController.clear();
+                    _fuelTypeController.clear();
+                    _chassisController.clear();
+                    _gearboxController.clear();
+                    _engineSizeController.clear();
+                    _horsepowerController.clear();
+                    _priceController.clear();
+                    _buyPriceController.clear();
+                    _spentController.clear();
+                    _imagePathController.clear();
+                  },
+                  child: const Text('Save'),
                 ),
-                TextField(
-                  controller: _kilometersController,
-                  decoration: const InputDecoration(
-                    hintText: 'Kilometers',
-                  ),
-                ),
-                TextField(
-                  controller: _fuelTypeController,
-                  decoration: const InputDecoration(
-                    hintText: 'Fuel type',
-                  ),
-                ),
-                TextField(
-                  controller: _chassisController,
-                  decoration: const InputDecoration(
-                    hintText: 'Chassis type',
-                  ),
-                ),
-                TextField(
-                  controller: _gearboxController,
-                  decoration: const InputDecoration(
-                    hintText: 'Gearbox type',
-                  ),
-                ),
-                TextField(
-                  controller: _engineSizeController,
-                  decoration: const InputDecoration(
-                    hintText: 'Engine size',
-                  ),
-                ),
-                TextField(
-                  controller: _horsepowerController,
-                  decoration: const InputDecoration(
-                    hintText: 'Horsepower',
-                  ),
-                ),
-                TextField(
-                  controller: _priceController,
-                  decoration: const InputDecoration(
-                    hintText: 'Selling for',
-                  ),
-                ),
-                TextField(
-                  controller: _buyPriceController,
-                  decoration: const InputDecoration(
-                    hintText: 'Bought for',
-                  ),
-                ),
-                TextField(
-                  controller: _spentController,
-                  decoration: const InputDecoration(
-                    hintText: 'Money spent on',
-                  ),
-                ),
-                TextField(
-                  controller: _soldFor,
-                  decoration: const InputDecoration(
-                    hintText: 'Sold for',
-                  ),
-                ),
-                TextField(
-                  controller: _imagePath,
-                  decoration: const InputDecoration(
-                    hintText: 'Image path',
-                  ),
+
+                // cancel button
+                MaterialButton(
+                  onPressed: () {
+                    // pop box
+                    Navigator.pop(context);
+
+                    // Clear controllers
+                    _carNameController.clear();
+                    _carYearController.clear();
+                    _kilometersController.clear();
+                    _fuelTypeController.clear();
+                    _chassisController.clear();
+                    _gearboxController.clear();
+                    _engineSizeController.clear();
+                    _horsepowerController.clear();
+                    _priceController.clear();
+                    _buyPriceController.clear();
+                    _spentController.clear();
+                    _imagePathController.clear();
+                  },
+                  child: const Text('Cancel'),
                 ),
               ],
-            ),
-          ),
-        ),
-        actions: [
-          // save button
-          MaterialButton(
-            onPressed: () async {
-              // get the new car data
-              String newCarName = _carNameController.text;
-              int newCarYear = int.parse(_carYearController.text);
-              int newCarKilometers = int.parse(_kilometersController.text);
-              String newCarChassis = _chassisController.text;
-              String newCarGearbox = _gearboxController.text;
-              String newCarFuelType = _fuelTypeController.text;
-              int newCarHorsepower = int.parse(_horsepowerController.text);
-              int newCarEngineSize = int.parse(_engineSizeController.text);
-              double boughtFor = double.parse(_buyPriceController.text);
-              double spentOn = double.parse(_spentController.text);
-              double sellingFor = double.parse(_priceController.text);
-              double soldFor = double.parse(_soldFor.text);
-              String imagePath = _imagePath.text;
-
-              OwnCar updatedCar = OwnCar(
-                name: newCarName,
-                fuelType: newCarFuelType,
-                kilometers: newCarKilometers,
-                year: newCarYear,
-                price: sellingFor,
-                chassis: newCarChassis,
-                gearbox: newCarGearbox,
-                engineSize: newCarEngineSize,
-                horsepower: newCarHorsepower,
-                buyPrice: boughtFor,
-                spent: spentOn,
-                sellPrice: soldFor,
-                imagePath: imagePath
-              );
-
-              try {
-                final token = await AuthService.getToken();
-                if (token == null) {
-                  throw Exception("User is not authenticated");
-                }
-                
-                final userId = await AuthService.getUserIdFromToken(token);
-                if (userId == null) {
-                  throw Exception("Invalid user ID");
-                }
-
-                // Validate car ID
-                if (ownCar.id == null) {
-                  throw Exception("Invalid car ID");
-                }
-
-                // Call the API service to add the new car
-                await ApiService.editOwnCar(userId, ownCar.id!, updatedCar);
-
-                // Reload cars after adding a new one
-                loadOwnCars();
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: ${e.toString()}')),
-                );
-              }
-
-              // Pop box
-              Navigator.pop(context);
-
-              // Clear controllers
-              _carNameController.clear();
-              _carYearController.clear();
-              _kilometersController.clear();
-              _fuelTypeController.clear();
-              _chassisController.clear();
-              _gearboxController.clear();
-              _engineSizeController.clear();
-              _horsepowerController.clear();
-              _priceController.clear();
-              _buyPriceController.clear();
-              _spentController.clear();
-            },
-            child: const Text('Save'),
-          ),
-
-          // cancel button
-          MaterialButton(
-            onPressed: () {
-              // pop box
-              Navigator.pop(context);
-
-              // Clear controllers
-              _carNameController.clear();
-              _carYearController.clear();
-              _kilometersController.clear();
-              _fuelTypeController.clear();
-              _chassisController.clear();
-              _gearboxController.clear();
-              _engineSizeController.clear();
-              _horsepowerController.clear();
-              _priceController.clear();
-              _buyPriceController.clear();
-              _spentController.clear();
-            },
-            child: const Text('Cancel'),
-          ),
-        ],
-      )
-    );
+            ));
   }
 
   // delete car box
   void deleteCarBox(OwnCar ownCar) {
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Are you sure you want to delete?'),
-        actions: [
-          // delete button
-          MaterialButton(
-            onPressed: () async {
-              // delete from db
-              try {
-                // Get token
-                final token = await AuthService.getToken();
-                if (token == null) {
-                  throw Exception("User is not authenticated");
-                }
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Are you sure you want to delete?'),
+              actions: [
+                // delete button
+                MaterialButton(
+                  onPressed: () async {
+                    // delete from db
+                    try {
+                      // Get token
+                      final token = await AuthService.getToken();
+                      if (token == null) {
+                        throw Exception("User is not authenticated");
+                      }
 
-                // Get user ID
-                final userId = await AuthService.getUserIdFromToken(token);
-                if (userId == null) {
-                  throw Exception("Invalid user ID");
-                }
+                      // Get user ID
+                      final userId =
+                          await AuthService.getUserIdFromToken(token);
+                      if (userId == null) {
+                        throw Exception("Invalid user ID");
+                      }
 
-                // Validate car ID
-                if (ownCar.id == null) {
-                  throw Exception("Invalid car ID");
-                }
+                      // Validate car ID
+                      if (ownCar.id == null) {
+                        throw Exception("Invalid car ID");
+                      }
 
-                // Call API to delete the car
-                await ApiService.deleteOwnCar(userId, ownCar.id!);
+                      // Call API to delete the car
+                      await ApiService.deleteOwnCar(userId, ownCar.id!);
 
-                // Reload the list of cars after deletion
-                loadOwnCars();
+                      // Reload the list of cars after deletion
+                      loadOwnCars();
 
-                // Show success message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Car deleted successfully')),
-                );
-              } catch (e) {
-                // Show error message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: ${e.toString()}')),
-                );
-              }
+                      // Show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Car deleted successfully')),
+                      );
+                    } catch (e) {
+                      // Show error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${e.toString()}')),
+                      );
+                    }
 
-              // pop box
-              Navigator.pop(context);
-            },
-            child: const Text('Delete'),
-          ),
+                    // pop box
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Delete'),
+                ),
 
-          // cancel button
-          MaterialButton(
-            onPressed: () {
-              // pop box
-              Navigator.pop(context);
-            },
-            child: const Text('Cancel'),
-          ),
-        ],
-      )
-    );
+                // cancel button
+                MaterialButton(
+                  onPressed: () {
+                    // pop box
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancel'),
+                ),
+              ],
+            ));
   }
 
   @override
@@ -564,7 +625,8 @@ class _MainPageState extends State<MainPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ChatbotPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const ChatbotPage()),
                   );
                 },
                 elevation: 0,
@@ -575,25 +637,41 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Your Cars',
-                style: GoogleFonts.dmSerifText(
-                  fontSize: 36,
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                )
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 80.0),
-                  child: ListView.builder(
-                    itemCount: _myOwnCars.length,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    'Your Cars',
+                    style: GoogleFonts.dmSerifText(
+                      fontSize: 36,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // Active Cars Section
+                if (_myOwnCars.isEmpty)
+                  Center(
+                    child: Text(
+                      'No active cars yet...',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.dmSerifText(
+                        fontSize: 24,
+                        color: Theme.of(context).colorScheme.inversePrimary,
+                      ),
+                    ),
+                  )
+                else
+                  ListView.builder(
                     shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _myOwnCars.length,
                     itemBuilder: (context, index) {
                       OwnCar ownCar = _myOwnCars[index];
-
                       return OwnCarTile(
                         ownCar: ownCar,
                         editCar: (context) {
@@ -606,20 +684,107 @@ class _MainPageState extends State<MainPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => OwnCarDetailsPage(ownCar: ownCar),
+                              builder: (context) =>
+                                  OwnCarDetailsPage(ownCar: ownCar),
                             ),
                           );
                         },
                         onButtonTap: () {
-                          // Additional button tap action if needed
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: const Text('Sold car?'),
+                                    content: TextField(
+                                      controller: _soldForController,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Sold for',
+                                      ),
+                                    ),
+                                    actions: [
+                                      // confirm button
+                                      MaterialButton(
+                                        onPressed: () async {
+                                          sellCar(ownCar);
+                                          // pop box
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Confirm'),
+                                      ),
+
+                                      // cancel button
+                                      MaterialButton(
+                                        onPressed: () {
+                                          _soldForController.clear();
+                                          // pop box
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Cancel'),
+                                      ),
+                                    ],
+                                  ));
                         },
                       );
                     },
                   ),
+
+                const SizedBox(height: 20),
+
+                // Sold Cars Section
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    'Sold Cars',
+                    style: GoogleFonts.dmSerifText(
+                      fontSize: 36,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 10),
+
+                if (_mySoldCars.isEmpty)
+                  Center(
+                    child: Text(
+                      'No sold cars yet...',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.dmSerifText(
+                        fontSize: 24,
+                        color: Theme.of(context).colorScheme.inversePrimary,
+                      ),
+                    ),
+                  )
+                else
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _mySoldCars.length,
+                    itemBuilder: (context, index) {
+                      OwnCar soldCar = _mySoldCars[index];
+                      return OwnCarTile(
+                        ownCar: soldCar,
+                        editCar: (context) {
+                          editCarBox(soldCar);
+                        },
+                        deleteCar: (context) {
+                          deleteCarBox(soldCar);
+                        },
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  OwnCarDetailsPage(ownCar: soldCar),
+                            ),
+                          );
+                        },
+                        onButtonTap: () {},
+                      );
+                    },
+                  ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
-      ));
+        ));
   }
 }

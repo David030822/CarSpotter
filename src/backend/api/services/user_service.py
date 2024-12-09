@@ -10,11 +10,14 @@ from api.repositories.user_repository import (
     get_favourite,
     add_favourite,
     get_following,
+    get_own_car_by_id,
+    get_sold_cars_by_dealer_id,
     is_followed,
     remove_favourite,
     get_user_by_id,
     get_own_cars_by_user,
     get_favourite_dealers_by_user,
+    sell_own_car,
     update_user_repository,
     add_car_to_db
 )
@@ -62,8 +65,10 @@ def get_own_cars_service(user_id: int, db: Session):
     user = get_user_by_id(db, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
-    return get_own_cars_by_user(db, user_id)
+    own_cars = get_own_cars_by_user(db, user_id)
+    sold_cars = get_sold_own_cars_by_user_id_service(user_id=user_id, db=db)
+    result = [car for car in own_cars if car not in sold_cars]
+    return result
 
 def get_user_data_service(user_id: int, db: Session):
     user = get_user_by_id(db, user_id)
@@ -158,3 +163,34 @@ def is_followed_service(user_id: int, following_id: int, db: Session):
         raise ValueError(f"User does not exist.")
 
     return is_followed(user_id, following_id, db)
+
+
+def get_sold_cars_by_dealer_id_service(dealer_id: int, db: Session):
+    dealer = get_dealer_by_id(db, dealer_id)
+    if not dealer: 
+        raise ValueError(f"dealer does not exist.")
+    return get_sold_cars_by_dealer_id(dealer_id, db)
+
+def get_sold_own_cars_by_user_id_service(user_id: int, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user: 
+        raise ValueError(f"User does not exist.")
+    own_cars =  get_own_cars_by_user(db=db, user_id=user_id)
+    sold_own_car = []
+    if not own_cars:
+        return []
+    for car in own_cars:
+        print(car.sold_for)
+        if car.sold_for and (car.sold_for != 0.0):
+            sold_own_car.append(car)
+    return sold_own_car
+
+
+def sell_own_car_service(user_id: int, own_car_id: int, sell_for: float, db: Session):
+    user = get_user_by_id(db, user_id)
+    if not user: 
+        raise ValueError(f"User does not exist.")
+    car = get_own_car_by_id(db, own_car_id)
+    if not car: 
+        raise ValueError(f"Own car does not exist.")
+    return sell_own_car(own_car_id=own_car_id, sell_for=sell_for, db=db)
