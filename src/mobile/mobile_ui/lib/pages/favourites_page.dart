@@ -39,7 +39,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Don't have any favourite dealer yet")));
+          const SnackBar(content: Text("Dont have any favourite dealer yet")));
     }
   }
 
@@ -63,14 +63,8 @@ class _FavouritesPageState extends State<FavouritesPage> {
                   final dealer = favoriteDealers[index];
                   dealer.isFavorited = true;
 
-                  return FutureBuilder<List<List<Car>>>(
-                    future: Future.wait([
-                      ApiService.getCarsByDealerId(
-                          dealer.id), // Ez Future<List<Car>>
-                      ApiService.getSoldCarsByDealerId(
-                          dealer.id), // Ez Future<List<Car>>
-                    ]),
-                    
+                  return FutureBuilder<List<Car>>(
+                    future: ApiService.getCarsByDealerId(dealer.id), 
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -85,10 +79,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
                           ),
                         );
                       } else if (snapshot.hasData) {
-                        final cars = snapshot.data![
-                            0]; 
-                        final soldCars = snapshot.data![
-                            1]; 
+                        final cars = snapshot.data!;
                         return DealerTile(
                           dealer: dealer,
                           onTap: () {
@@ -98,7 +89,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
                                 builder: (context) => DealerCarsPage(
                                   cars: cars,
                                   name: dealer.name,
-                                  soldCars: soldCars,
+                                  dealerId: dealer.id,
                                 ),
                               ),
                             );

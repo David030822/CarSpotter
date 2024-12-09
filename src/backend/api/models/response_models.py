@@ -3,6 +3,19 @@ from typing import Optional
 import os
 import base64
 
+
+class MonthlySalesData(BaseModel):
+    month: str  
+    sold_count: int  
+
+class SalesData(BaseModel):
+    day: str 
+    sold_count: int
+
+class StatisticsResponse(BaseModel):
+    weekly_sales: List[SalesData]
+    monthly_sales: List[MonthlySalesData]
+
 class CarResponse(BaseModel):
     id: int
     model: str 

@@ -1,7 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:mobile_ui/models/monthly_sales.dart';
 import 'package:mobile_ui/models/own_car.dart';
+import 'package:mobile_ui/models/weekly_sales.dart';
+import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_ui/services/auth_service.dart';
 import 'package:mobile_ui/models/dealer.dart';
@@ -13,7 +17,7 @@ import 'package:mobile_ui/models/user.dart';
 
 class ApiService {
   //static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";  //Lori
-  static const String baseUrl = "https://ed11-86-123-132-171.ngrok-free.app";
+  static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
@@ -33,8 +37,9 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
-      return jsonList.map((json) => Car.fromJson(json)).toList();
+      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      final List<dynamic> carsJson = jsonResponse['cars'];
+      return carsJson.map((json) => Car.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cars: ${response.body}');
     }
@@ -470,49 +475,76 @@ class ApiService {
     }
   }
 
-  static Future<List<Car>> getSoldCarsByDealerId(int dealerId) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/sold_cars/$dealerId'),
-    );
+static Future<Map<String, List<dynamic>>> fetchSalesData(int userId) async {
+  final url = Uri.parse('$baseUrl/statistics/$userId');
 
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
-      return jsonList.map((json) => Car.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load cars: ${response.body}');
-    }
+  final token = await AuthService.getToken();
+  if (token == null) {
+    throw Exception("User is not logged in");
   }
 
-  static Future<List<OwnCar>> getOwnSoldCars(int userId) async {
-    final response = await http.get(Uri.parse('$baseUrl/sold_owncars/$userId'));
+  final headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Bearer $token',
+  };
 
-    if (response.statusCode == 200) {
-      final List<dynamic> carList = jsonDecode(response.body);
-      return carList.map((json) => OwnCar.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load cars: ${response.body}');
-    }
+  final response = await http.get(url, headers: headers);
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+
+    final weeklySales = (data['weekly_sales'] as List<dynamic>)
+        .map((item) => WeeklySales.fromJson(item))
+        .toList();
+
+    final monthlySales = (data['monthly_sales'] as List<dynamic>)
+        .map((item) => MonthlySales.fromJson(item))
+        .toList();
+
+    return {
+      'weekly_sales': weeklySales,
+      'monthly_sales': monthlySales,
+    };
+  } else {
+    throw Exception('Failed to load sales data');
+  }
+}
+
+static Future<Map<String, List<dynamic>>> fetchSalesDataForDealer(int dealerId) async {
+  final url = Uri.parse('$baseUrl/dealer_statistics/$dealerId');
+
+  final token = await AuthService.getToken();
+  if (token == null) {
+    throw Exception("User is not logged in");
   }
 
-  static Future<void> sellOwnCar(int userId, int ownCarId, double sellFor) async {
-    final url = Uri.parse('$baseUrl/sell_owncar/$userId');
-    final body = json.encode({
-      'own_car_id': ownCarId,
-      'sell_for': sellFor,
-    });
+  final headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Bearer $token',
+  };
 
-    final response = await http.put(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: body,
-    );
+  final response = await http.get(url, headers: headers);
 
-    if (response.statusCode == 200) {
-      print('Car sold successfully.');
-    } else {
-      throw Exception('Failed to sell car: ${response.body}');
-    }
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+
+    final weeklySales = (data['weekly_sales'] as List<dynamic>)
+        .map((item) => WeeklySales.fromJson(item))
+        .toList();
+
+    final monthlySales = (data['monthly_sales'] as List<dynamic>)
+        .map((item) => MonthlySales.fromJson(item))
+        .toList();
+
+    return {
+      'weekly_sales': weeklySales,
+      'monthly_sales': monthlySales,
+    };
+  } else {
+    throw Exception('Failed to load sales data');
   }
+}
+
 }

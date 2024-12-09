@@ -164,6 +164,7 @@ class _SearchPageState extends State<SearchPage> {
                               cars: _dealerCars,
                               soldCars: _dealerSoldCars,
                               name: dealer.name,
+                              dealerId: dealer.id,
                             ),
                           ),
                         );
