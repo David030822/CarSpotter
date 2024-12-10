@@ -1,12 +1,12 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'package:flutter/material.dart';
 import 'package:mobile_ui/components/drawer_tile.dart';
 import 'package:mobile_ui/pages/about_page.dart';
+import 'package:mobile_ui/pages/event_page.dart';
 import 'package:mobile_ui/pages/home_page.dart';
 import 'package:mobile_ui/pages/login_page.dart';
 import 'package:mobile_ui/pages/profile_page.dart';
 import 'package:mobile_ui/pages/settings_page.dart';
+import 'package:mobile_ui/pages/statistics_page.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
@@ -26,7 +26,7 @@ class MyDrawer extends StatelessWidget {
                 DrawerHeader(
                   child: Icon(Icons.directions_car),
                 ),
-        
+
                 // home tile
                 DrawerTile(
                   title: 'H O M E',
@@ -35,11 +35,9 @@ class MyDrawer extends StatelessWidget {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => HomePage()
-                      ),
+                      MaterialPageRoute(builder: (context) => HomePage()),
                     );
-                  } 
+                  },
                 ),
 
                 // profile tile
@@ -47,16 +45,46 @@ class MyDrawer extends StatelessWidget {
                   title: 'P R O F I L E',
                   leading: const Icon(Icons.person),
                   onTap: () {
+                    // Itt most statikus adatokat jelenítünk meg, nem kérjük le az adatokat
                     Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProfilePage(),
+                        builder: (context) => const ProfilePage(), // Ne adjunk át user adatot
                       ),
                     );
-                  } 
+                  },
                 ),
-        
+
+                DrawerTile(
+                  title: 'S T A T I S T I C S',
+                  leading: const Icon(Icons.show_chart),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const StatisticsPage(isUser: true, dealerId: 0),
+                      ),
+                    );
+                  },
+                ),
+
+                // events tile - heatmap for sold and bought cars
+                DrawerTile(
+                  title: 'E V E N T S',
+                  leading: const Icon(Icons.calendar_month),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EventsPage(),
+                      ),
+                    );
+                  },
+                ),
+
                 // settings tile
                 DrawerTile(
                   title: 'S E T T I N G S',
@@ -65,9 +93,7 @@ class MyDrawer extends StatelessWidget {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => SettingsPage()
-                      ),
+                      MaterialPageRoute(builder: (context) => SettingsPage()),
                     );
                   },
                 ),
@@ -80,11 +106,9 @@ class MyDrawer extends StatelessWidget {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => AboutPage()
-                      ),
+                      MaterialPageRoute(builder: (context) => const AboutPage()),
                     );
-                  } 
+                  },
                 ),
               ],
             ),
@@ -97,9 +121,7 @@ class MyDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginPage()
-                  ),
+                  MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               },
             ),

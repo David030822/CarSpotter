@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_ui/models/dealer.dart';
+import 'package:mobile_ui/services/auth_service.dart';
+import 'package:mobile_ui/services/api_service.dart';
 
 class DealerTile extends StatefulWidget {
   final Dealer dealer;
   final void Function() onTap;
-  void Function() onButtonTap;
+  final void Function() onButtonTap;
 
-  DealerTile({
+  const DealerTile({
     super.key,
     required this.dealer,
     required this.onTap,
@@ -14,11 +16,28 @@ class DealerTile extends StatefulWidget {
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _DealerTileState createState() => _DealerTileState();
 }
 
 class _DealerTileState extends State<DealerTile> {
-  bool isFavorited = false; // Track the favorite status
+  bool isFavorited = false;
+  int? userId; 
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserId();
+    isFavorited = widget.dealer.isFavorited;
+  }
+
+  Future<void> _initializeUserId() async {
+    final token = await AuthService.getToken();
+    final userIdFromToken = await AuthService.getUserIdFromToken(token);
+    setState(() {
+      userId = userIdFromToken;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +45,6 @@ class _DealerTileState extends State<DealerTile> {
       onTap: widget.onTap,
       child: Container(
         margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
-        width: 200,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary,
           borderRadius: BorderRadius.circular(12),
@@ -42,7 +60,7 @@ class _DealerTileState extends State<DealerTile> {
                   padding: const EdgeInsets.all(8.0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
+                    child: Image.network(
                       widget.dealer.imagePath,
                       height: 100,
                       width: 150,
@@ -51,19 +69,23 @@ class _DealerTileState extends State<DealerTile> {
                 ),
 
                 // name
-                Padding(
-                  padding: const EdgeInsets.only(right: 65.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        widget.dealer.name,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.inversePrimary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 15.0),
+                    child: Column(
+                      children: [
+                        Text(
+                            widget.dealer.name,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.inversePrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -97,10 +119,26 @@ class _DealerTileState extends State<DealerTile> {
 
                   // button to add to favorites
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       setState(() {
                         isFavorited = !isFavorited;
                       });
+
+                      try {
+                        await ApiService.toggleFavorite(userId!, widget.dealer.id, isFavorited);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(isFavorited
+                                ? '${widget.dealer.name} added to favorites'
+                                : '${widget.dealer.name} removed from favorites'),
+                          ),
+                        );
+                      } catch (e) {
+                        // Handle error
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to update favorite status')),
+                        );
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.all(20),
