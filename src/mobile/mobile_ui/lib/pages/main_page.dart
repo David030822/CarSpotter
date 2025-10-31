@@ -620,22 +620,22 @@ class _MainPageState extends State<MainPage> {
             ),
 
             // Chatbot Button
-            Positioned(
-              bottom: 5, // Offset for positioning
-              left: 45,
-              child: FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ChatbotPage()),
-                  );
-                },
-                elevation: 0,
-                backgroundColor: Theme.of(context).colorScheme.tertiary,
-                child: const Icon(Icons.chat),
-              ),
-            ),
+            // Positioned(
+            //   bottom: 5, // Offset for positioning
+            //   left: 45,
+            //   child: FloatingActionButton(
+            //     onPressed: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => const ChatbotPage()),
+            //       );
+            //     },
+            //     elevation: 0,
+            //     backgroundColor: Theme.of(context).colorScheme.tertiary,
+            //     child: const Icon(Icons.chat),
+            //   ),
+            // ),
           ],
         ),
         body: Center(

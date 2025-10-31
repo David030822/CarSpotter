@@ -23,6 +23,7 @@ Map<String, String> parseEventName(String eventName) {
 
 // prepare heat map dataset
 Map<DateTime, int> prepHeatMapDataset(List<Event> events) {
+  Map<DateTime, Set<String>> tempDataset = {};
   Map<DateTime, int> dataset = {};
 
   for (var event in events) {
@@ -32,14 +33,23 @@ Map<DateTime, int> prepHeatMapDataset(List<Event> events) {
       event.date.day,
     );
 
-    if (dataset.containsKey(normalizedDate)) {
-      // Both sold and bought on the same day
-      dataset[normalizedDate] = 3;
-    } else {
-      // Assign value based on event type
-      dataset[normalizedDate] = event.type == 'Sold' ? 1 : 2;
+    // Collect event types for each day
+    if (!tempDataset.containsKey(normalizedDate)) {
+      tempDataset[normalizedDate] = {};
     }
+    tempDataset[normalizedDate]!.add(event.type);
   }
+
+  // Determine the color code based on the types of events
+  tempDataset.forEach((date, types) {
+    if (types.contains('Sold') && types.contains('Bought')) {
+      dataset[date] = 3; // Yellow for both Sold and Bought
+    } else if (types.contains('Sold')) {
+      dataset[date] = 1; // Green for Sold only
+    } else if (types.contains('Bought')) {
+      dataset[date] = 2; // Red for Bought only
+    }
+  });
 
   return dataset;
 }

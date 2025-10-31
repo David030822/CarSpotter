@@ -120,7 +120,7 @@ class _SearchPageState extends State<SearchPage> {
                       children: [
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
+                            padding: const EdgeInsets.only(top: 10.0, bottom: 20),
                             child: MyTextField(
                               controller: _searchController,
                               hintText: 'Enter a dealer name',

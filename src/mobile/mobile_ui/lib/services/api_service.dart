@@ -14,8 +14,7 @@ import 'package:mobile_ui/models/user.dart';
 // uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 class ApiService {
-  static const String baseUrl = "https://joint-knowing-drake.ngrok-free.app";  //Lori
-  //static const String baseUrl = "https://f1c7-86-123-132-171.ngrok-free.app";
+  static const String baseUrl = "https://988f-212-93-150-81.ngrok-free.app";
   // Dealer API hívás
   static Future<Map<String, dynamic>> getCarsByDealer(String dealerName) async {
     final response = await http.get(
@@ -589,5 +588,4 @@ class ApiService {
       throw Exception('Failed to load sales data');
     }
   }
-
 }
